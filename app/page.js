@@ -4,6 +4,9 @@ import { useState } from "react";
 import { auth, provider, signInWithPopup } from "@/firebase";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { Provider } from "react-redux";
+import store from "./store";
+import Wrapper from "./wrapper";
 
 export default function Home() {
   const [user, setUser] = useState(null);
