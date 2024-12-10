@@ -12,16 +12,18 @@ const withAuth = (WrappedComponent) => {
     const [loading, setLoading] = useState(true); // Add a loading state
 
     useEffect(() => {
-      const storedUser = localStorage.getItem("user");
+      if (typeof window !== "undefined") {
+        const storedUser = localStorage.getItem("user");
 
-      if (!storedUser) {
-        router.replace("/"); // Redirect to login if no user found
-      } else if (!user) {
-        // Sync Redux state with localStorage if Redux is empty
-        dispatch(setUser(JSON.parse(storedUser)));
-        setLoading(false);
-      } else {
-        setLoading(false);
+        if (!storedUser) {
+          router.replace("/"); // Redirect to login if no user found
+        } else if (!user) {
+          // Sync Redux state with localStorage if Redux is empty
+          dispatch(setUser(JSON.parse(storedUser)));
+          setLoading(false);
+        } else {
+          setLoading(false);
+        }
       }
     }, [user, router, dispatch]);
 

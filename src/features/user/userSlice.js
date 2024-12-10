@@ -1,10 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// Initialize from localStorage
-const persistedUser = JSON.parse(localStorage.getItem("user"));
-
 const initialState = {
-  user: persistedUser || null, // Use persisted user if available
+  user: null, // Start with null; sync later on the client
 };
 
 const userSlice = createSlice({
@@ -13,11 +10,15 @@ const userSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload;
-      localStorage.setItem("user", JSON.stringify(action.payload)); // Sync to localStorage
+      if (typeof window !== "undefined") {
+        localStorage.setItem("user", JSON.stringify(action.payload)); // Ensure this runs on the client
+      }
     },
     clearUser: (state) => {
       state.user = null;
-      localStorage.removeItem("user"); // Clear from localStorage
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("user"); // Ensure this runs on the client
+      }
     },
   },
 });
