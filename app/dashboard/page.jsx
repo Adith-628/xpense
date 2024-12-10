@@ -1,8 +1,8 @@
 "use client";
 
+import { TextGenerateEffect } from "@/components/ui/text-generate";
 import AddTransaction from "@/src/components/organisms/AddTransaction";
 import { fetchBalance } from "@/src/features/transaction/asyncFn";
-import { credit, debit } from "@/src/features/transaction/transactionSlice";
 import { deleteTransaction } from "@/utils/api/deleteTransaction";
 import { getUserTransactions } from "@/utils/api/getUserTransactions";
 import { updateBalance } from "@/utils/api/updateBalance";
@@ -11,6 +11,7 @@ import { Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { motion } from "framer-motion";
 
 const TransactionPage = () => {
   const dispatch = useDispatch();
@@ -61,13 +62,40 @@ const TransactionPage = () => {
   useEffect(() => {
     fetchTransactions();
   }, []);
+  const [displayedBalance, setDisplayedBalance] = useState(0);
+
+  useEffect(() => {
+    if (status !== "loading" && balance !== null) {
+      let start = 0;
+      const duration = 500; // animation duration in ms
+      const increment = balance / (duration / 10); // update every 10ms
+
+      const timer = setInterval(() => {
+        start += increment;
+        if (start >= balance) {
+          start = balance;
+          clearInterval(timer);
+        }
+        setDisplayedBalance(parseFloat(start.toFixed(2)));
+      }, 10);
+
+      return () => clearInterval(timer); // cleanup on unmount
+    }
+  }, [balance, status]);
 
   return (
-    <div className="flex flex-col flex-1 gap-4 px-2 font-urbanist">
+    <div className="flex h-screen flex-col overflow-y-auto flex-1 gap-4 px-2 font-urbanist">
       <div className="font-fira flex py-4 justify-between items-center">
-        <div className="text-4xl  py-4 ">
+        <div className="text-4xl flex items-center gap-1.5 py-4 ">
           <span className="text-slate-500 tracking-tight">Hi,{""}</span>
-          <span className="font-bold text-slate-950"> {name}</span>
+          <span className="font-bold text-slate-950">
+            <TextGenerateEffect
+              className="font-bold text-4xl"
+              duration={1}
+              filter={false}
+              words={name}
+            />
+          </span>
         </div>
         <div className="">
           {/* profile image */}
@@ -92,13 +120,20 @@ const TransactionPage = () => {
         <div className="">
           Balance:{" "}
           <span>
-            {status == "loading" ? (
+            {status === "loading" ? (
               <div className="text-sm">Loading....</div>
             ) : balance !== null ? (
-              <div className="text-5xl font-semibold my-2">${balance}</div>
+              <motion.div
+                className="text-5xl font-semibold my-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                ${displayedBalance}
+              </motion.div>
             ) : (
               "Fetching..."
-            )}{" "}
+            )}
           </span>
         </div>
       </div>
@@ -115,12 +150,12 @@ const TransactionPage = () => {
       </div>
       <div className="flex flex-col">
         <div className="">Transactions</div>
-        <div className="">
+        <div className="overflow-y-auto h-full">
           {Array.isArray(transactions) && transactions.length > 0 ? (
             transactions.map((transaction, index) => (
               <div
                 key={index}
-                className="flex gap-2 p-2 bg-gray-500 justify-start"
+                className="flex gap-2 p-2  border-b justify-between"
               >
                 <div>{transaction.name}</div>
                 <div>{transaction.amount}</div>
