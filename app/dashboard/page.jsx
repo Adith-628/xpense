@@ -63,8 +63,8 @@ const TransactionPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col flex-1 gap-2 font-urbanist">
-      <div className="font-fira flex justify-between items-center">
+    <div className="flex flex-col flex-1 gap-2 px-2 font-urbanist">
+      <div className="font-fira flex py-4 justify-between items-center">
         <div className="text-4xl  py-4 ">
           <span className="text-slate-500 tracking-tight">Hi,{""}</span>
           <span className="font-bold text-slate-950"> {name}</span>
@@ -78,6 +78,28 @@ const TransactionPage = () => {
             width={50}
             height={50}
           />
+        </div>
+      </div>
+
+      {/* Balance Card */}
+      <div className="border-gray-600 relative border flex justify-start gap-4 flex-col  w-60 h-40 p-4 rounded-2xl hover:scale-105 transition-all duration-200">
+        <div className="text-xl font-semibold flex items-center justify-between ">
+          <div className="">Account</div>
+          <div className="absolute right-2 top-1.5">
+            <Image src="/wallet3.png" width={35} height={35} alt="visa" />
+          </div>
+        </div>
+        <div className="">
+          Balance:{" "}
+          <span>
+            {status == "loading" ? (
+              <div className="text-sm">Loading....</div>
+            ) : balance !== null ? (
+              <div className="text-5xl font-semibold my-2">${balance}</div>
+            ) : (
+              "Fetching..."
+            )}{" "}
+          </span>
         </div>
       </div>
 
