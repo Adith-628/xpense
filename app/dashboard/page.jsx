@@ -63,7 +63,7 @@ const TransactionPage = () => {
   }, []);
 
   return (
-    <div className="flex flex-col flex-1 gap-2 px-2 font-urbanist">
+    <div className="flex flex-col flex-1 gap-4 px-2 font-urbanist">
       <div className="font-fira flex py-4 justify-between items-center">
         <div className="text-4xl  py-4 ">
           <span className="text-slate-500 tracking-tight">Hi,{""}</span>
