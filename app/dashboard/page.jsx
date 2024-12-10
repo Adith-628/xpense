@@ -18,8 +18,8 @@ const TransactionPage = () => {
 
   const { balance, status, error } = useSelector((state) => state.transaction);
   const { user } = useSelector((state) => state.user);
-  const name = user?.name;
-  console.log(user, "----");
+  console.log(user);
+  const name = user?.displayName;
 
   const [transactions, setTransactions] = useState([]);
 
@@ -65,9 +65,9 @@ const TransactionPage = () => {
   return (
     <div className="flex flex-col flex-1 gap-2 font-urbanist">
       <div className="font-fira flex justify-between items-center">
-        <div className="text-4xl py-4 font-medium">
-          Hi,{""}
-          <span className="font-bold"> {name}</span>
+        <div className="text-4xl  py-4 ">
+          <span className="text-slate-500 tracking-tight">Hi,{""}</span>
+          <span className="font-bold text-slate-950"> {name}</span>
         </div>
         <div className="">
           {/* profile image */}

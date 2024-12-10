@@ -14,14 +14,13 @@ const LoginPage = () => {
   const handleSignIn = async () => {
     try {
       const response = await signInWithPopup(auth, provider);
-      dispatch(
-        setUser({
-          uid: response.user.uid,
-          name: response.user.displayName,
-          email: response.user.email,
-          photoURL: response.user.photoURL,
-        })
-      );
+      const userData = {
+        uid: response.user.uid,
+        displayName: response.user.displayName,
+        email: response.user.email,
+        photoURL: response.user.photoURL,
+      };
+      dispatch(setUser(userData)); // Persist to Redux and localStorage
       router.push("/dashboard");
     } catch (err) {
       console.error(err);
