@@ -1,46 +1,53 @@
 "use client";
-
-import { useState } from "react";
-import { auth, provider, signInWithPopup } from "@/firebase";
-import Image from "next/image";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { clearUser, setUser } from "@/src/features/user/userSlice";
 import { useRouter } from "next/navigation";
-import { Provider } from "react-redux";
-import store from "./store";
-import Wrapper from "./wrapper";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "@/firebase";
 
-export default function Home() {
-  const [user, setUser] = useState(null);
+const LoginPage = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
+  const { user, status, error } = useSelector((state) => state.user);
 
-  // Sign in with Google
   const handleSignIn = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
+      const response = await signInWithPopup(auth, provider);
+      dispatch(
+        setUser({
+          uid: response.user.uid,
+          name: response.user.displayName,
+          email: response.user.email,
+          photoURL: response.user.photoURL,
+        })
+      );
       router.push("/dashboard");
-    } catch (error) {
-      console.error("Error during sign-in:", error);
+    } catch (err) {
+      console.error(err);
     }
+  };
+
+  const handleSignOut = () => {
+    dispatch(clearUser());
   };
 
   return (
     <div>
-      <div className="">Firebase Google Auth</div>
-      <div onClick={handleSignIn} className="">
-        {user ? (
-          <div>
-            <Image
-              src={user.photoURL}
-              width={50}
-              height={50}
-              alt={user.displayName}
-            />
-            <p>{user.displayName}</p>
-          </div>
-        ) : (
-          <p>Sign in with google</p>
-        )}
-      </div>
+      <h1>Login Page</h1>
+      <div className="">Firebase Auth</div>
+      {status === "loading" && <p>Loading...</p>}
+      {status === "failed" && <p>Error: {error}</p>}
+      {user ? (
+        <div>
+          <p>Welcome, {user.displayName}</p>
+          <button onClick={handleSignOut}>Sign Out</button>
+        </div>
+      ) : (
+        <button onClick={handleSignIn}>Sign In</button>
+      )}
     </div>
   );
-}
+};
+
+export default LoginPage;
