@@ -6,6 +6,7 @@ import { credit, debit } from "@/src/features/transaction/transactionSlice";
 import { deleteTransaction } from "@/utils/api/deleteTransaction";
 import { getUserTransactions } from "@/utils/api/getUserTransactions";
 import { updateBalance } from "@/utils/api/updateBalance";
+import withAuth from "@/utils/protectedRoute/withAuth";
 import { Trash2Icon } from "lucide-react";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
@@ -126,4 +127,4 @@ const TransactionPage = () => {
   );
 };
 
-export default TransactionPage;
+export default withAuth(TransactionPage);
