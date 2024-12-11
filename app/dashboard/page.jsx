@@ -149,7 +149,7 @@ const TransactionPage = () => {
         </h1>
       </div>
       <div className="flex flex-col">
-        <div className="">Transactions</div>
+        <div className="p-0.5">Transactions</div>
         <div className="overflow-y-auto">
           {Array.isArray(transactions) && transactions.length > 0 ? (
             transactions.map((transaction, index) => (
