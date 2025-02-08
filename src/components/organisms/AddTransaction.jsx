@@ -15,16 +15,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addTransaction } from "@/utils/api/addTransaction";
-import { updateBalance } from "@/utils/api/updateBalance";
-import { useDispatch } from "react-redux";
-import { fetchBalance } from "@/src/features/transaction/asyncFn";
-import { getUserTransactions } from "@/utils/api/getUserTransactions";
 
 const AddTransaction = ({ isOpen, setIsOpen, balance, fetchTransactions }) => {
   const [category, setCategory] = useState("");
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     console.log("category", category);
@@ -36,22 +29,7 @@ const AddTransaction = ({ isOpen, setIsOpen, balance, fetchTransactions }) => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = async (data) => {
-    try {
-      await addTransaction({
-        ...data,
-        type: category,
-      });
-      setIsOpen(false);
-      reset();
-      await updateBalance("xnzZNrWNO48O5Vx3Ha5y", data.amount, category);
-      alert("Transaction added successfully");
-      dispatch(fetchBalance(""));
-      fetchTransactions();
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  const onSubmit = async (data) => {};
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>

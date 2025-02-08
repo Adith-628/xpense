@@ -6,15 +6,15 @@ import { motion } from "framer-motion";
 import { DollarSign } from "lucide-react";
 import Image from "next/image";
 
-const BalanceCard = ({ balance }) => {
+const ExpenseCard = ({ balance = 0 }) => {
   return (
     <Card>
       <CardHeader className="flex  items-center justify-between pb-2">
         <div className="flex w-full items-center justify-between">
-          <div className="text-xl font-semibold">Account</div>
-          <div className="">
+          <div className="text-xl font-semibold">Total Spend</div>
+          {/* <div className="">
             <Image src="/wallet3.png" width={35} height={35} alt="visa" />
-          </div>
+          </div> */}
         </div>
         <div className="w-full flex">
           <CardTitle className="text-sm font-medium text-gray-500">
@@ -37,4 +37,4 @@ const BalanceCard = ({ balance }) => {
   );
 };
 
-export default BalanceCard;
+export default ExpenseCard;
