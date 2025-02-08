@@ -3,12 +3,14 @@ import { persist } from "zustand/middleware";
 import {
   addTransaction as addTransactionToSupabase,
   getTransactions as getTransactionsFromSupabase,
+  getBalance as getBalanceFromSupabase,
 } from "@/utils/database";
 
 export const useStore = create(
   persist(
     (set, get) => ({
       user: null,
+      total_balance: 0,
       transactions: [],
       setUser: (user) => set({ user }),
       addTransaction: async (transaction) => {
@@ -38,6 +40,13 @@ export const useStore = create(
 
         const transactions = await getTransactionsFromSupabase(user.id);
         set({ transactions });
+      },
+      fetchBalance: async () => {
+        const { user } = get();
+        if (!user) return;
+
+        const balance = await getBalanceFromSupabase(user.id);
+        set({ total_balance: balance });
       },
     }),
     {

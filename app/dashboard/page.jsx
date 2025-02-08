@@ -3,37 +3,53 @@
 import { TextGenerateEffect } from "@/components/ui/text-generate";
 import AddTransaction from "@/src/components/organisms/AddTransaction";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { use, useEffect, useState } from "react";
 import BalanceCard from "@/src/components/molecules/BalanceCard";
 import TransactionCard from "@/src/components/molecules/TransactionCard";
 import { useStore } from "@/src/store";
+import TransactionList from "@/src/components/organisms/TransactionList";
+import AddTransactionModal from "@/src/components/organisms/AddTransactionModal";
+import AddTransactionButton from "@/src/components/organisms/AddTransactionButton";
+import Header from "@/src/components/organisms/Header";
 
 const TransactionPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [transaction, setTransaction] = useState([]);
-  const { user } = useStore();
-  const displayedBalance = 0;
+  const { user, fetchBalance, total_balance } = useStore();
+  // const displayedBalance = 0;
 
-  // const name = user?.displayName;
-  const name = "Hello";
+  const [userName, setUserName] = useState("");
+  useEffect(() => {
+    if (user) {
+      setUserName(user.name);
+    }
+    console.log("user", user);
+  }, [user]);
+
+  useEffect(() => {
+    fetchBalance();
+  }, []);
 
   const [transactions, setTransactions] = useState([]);
 
   return (
     <div className="flex relative min-h-screen overflow-y-auto flex-col flex-1 gap-4 px-4 font-urbanist">
       <div className="font-fira flex py-4 justify-between items-center">
-        <div className="text-4xl flex items-center gap-1.5 py-4 ">
-          <span className="text-slate-500 tracking-tight">Hi,{""}</span>
+        {/* <div className="text-4xl flex items-center gap-1.5 py-4 ">
+          <span className="text-slate-500 tracking-tight">
+            Hi,{""}
+            {userName}{" "}
+          </span>
           <span className="font-bold text-slate-950">
             <TextGenerateEffect
               className="font-bold text-4xl"
               duration={1}
               filter={false}
-              words={name}
+              words={userName}
             />
           </span>
-        </div>
+        </div> */}
+        <Header />
         <div className="">
           {/* profile image */}
           {/* <Image
@@ -46,33 +62,14 @@ const TransactionPage = () => {
         </div>
       </div>
 
-      {/* Balance Card */}
-      {/* <div className="">
-          Balance:{" "}
-          <span>
-            {status === "loading" ? (
-              <div className="text-sm">Loading....</div>
-            ) : balance !== null ? (
-              <motion.div
-                className="text-5xl font-semibold my-2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                ${displayedBalance}
-              </motion.div>
-            ) : (
-              "Fetching..."
-            )}
-          </span>
-        </div> */}
       <div className="">
-        <BalanceCard balance={displayedBalance} />
+        <BalanceCard balance={total_balance} />
       </div>
 
       {/* <DailyExpense transactions={transactions} /> */}
-      {/* <TransationsTable transactions={transactions} /> */}
-      <div className="flex flex-col gap-4">
+      <TransactionList />
+      <AddTransactionButton />
+      {/* <div className="flex flex-col gap-4">
         <div className="font-bold text-lg"> Transactions</div>
         <div className="flex flex-col gap-2">
           {transactions.length > 0 &&
@@ -88,8 +85,8 @@ const TransactionPage = () => {
           balance={balance}
           setIsOpen={setIsOpen}
           // fetchTransactions={fetchTransactions}
-        /> */}
-      </div>
+        /> 
+      </div> */}
       {/* <DockDemo /> */}
     </div>
   );

@@ -7,6 +7,7 @@ export default function AddTransactionModal({ isOpen, onClose }) {
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Need");
+  const [type, setType] = useState("credit");
   const { addTransaction } = useStore();
 
   const handleSubmit = (e) => {
@@ -15,6 +16,7 @@ export default function AddTransactionModal({ isOpen, onClose }) {
       description,
       amount: Number.parseFloat(amount),
       category,
+      type,
       date: new Date().toISOString(),
     });
     console.log("Transaction added");
@@ -80,6 +82,23 @@ export default function AddTransactionModal({ isOpen, onClose }) {
               <option value="Need">Need</option>
               <option value="Want">Want</option>
               <option value="Investment">Investment</option>
+            </select>
+          </div>
+          <div>
+            <label
+              htmlFor="type"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Type
+            </label>
+            <select
+              id="type"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            >
+              <option value="credit">Credit</option>
+              <option value="debit">Debit</option>
             </select>
           </div>
           <div className="flex justify-end space-x-4">

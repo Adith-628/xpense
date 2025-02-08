@@ -7,11 +7,33 @@ export async function signIn(email, password) {
       email,
       password,
     });
+
     if (error) throw error;
+
     if (data.user) {
-      useStore
-        .getState()
-        .setUser({ id: data.user.id, email: data.user.email || "" });
+      const userId = data.user.id;
+
+      // Fetch user profile details
+      const { data: profile, error: profileError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+        throw profileError;
+      }
+
+      // Store user details in Zustand
+      useStore.getState().setUser({
+        id: userId,
+        email: data.user.email || "",
+        name: profile.name || "",
+        phone: profile.phone || "",
+        address: profile.address || "",
+      });
+
       await useStore.getState().fetchTransactions();
     }
   } catch (error) {
@@ -27,6 +49,51 @@ export async function signOut() {
     useStore.getState().setUser(null);
   } catch (error) {
     console.error("Error signing out: ", error);
+    throw error;
+  }
+}
+
+export async function signUp(email, password, name, phone, address) {
+  try {
+    // Sign up the user with email and password
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) throw error;
+
+    if (data?.user) {
+      const userId = data.user.id;
+
+      // Insert user details into the profiles table
+      const { error: profileError } = await supabase.from("users").insert([
+        {
+          id: userId,
+          name,
+          phone,
+          address,
+        },
+      ]);
+
+      if (profileError) {
+        console.error("Error inserting profile:", profileError);
+        throw profileError;
+      }
+
+      // Store user details in Zustand
+      useStore.getState().setUser({
+        id: userId,
+        email,
+        name,
+        phone,
+        address,
+      });
+
+      await useStore.getState().fetchTransactions();
+    }
+  } catch (error) {
+    console.error("Error signing up: ", error);
     throw error;
   }
 }

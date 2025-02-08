@@ -30,8 +30,6 @@ export async function getTransactions(userId) {
 
 export async function addTransactionToSupabase(userId, transaction) {
   try {
-    console.log(userId, transaction, "transaction-----");
-
     const { data, error } = await supabase
       .from("transactions")
       .insert([
@@ -50,6 +48,20 @@ export async function addTransactionToSupabase(userId, transaction) {
     return data;
   } catch (error) {
     console.error("Error adding transaction:", error);
+    throw error;
+  }
+}
+
+export async function getBalance(userId) {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("total_balance")
+      .eq("id", userId);
+    if (error) throw error;
+    return data[0].total_balance;
+  } catch (error) {
+    console.error("Error getting balance: ", error);
     throw error;
   }
 }

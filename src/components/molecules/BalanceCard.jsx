@@ -1,12 +1,32 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { DollarSign } from "lucide-react";
 import Image from "next/image";
 
 const BalanceCard = ({ balance }) => {
+  const [displayedBalance, setDisplayedBalance] = useState(0);
+
+  useEffect(() => {
+    if (balance !== null) {
+      let start = 0;
+      const duration = 500; // animation duration in ms
+      const increment = balance / (duration / 10); // update every 10ms
+
+      const timer = setInterval(() => {
+        start += increment;
+        if (start >= balance) {
+          start = balance;
+          clearInterval(timer);
+        }
+        setDisplayedBalance(parseFloat(start.toFixed(2)));
+      }, 10);
+
+      return () => clearInterval(timer); // cleanup on unmount
+    }
+  }, [balance]);
   return (
     <Card>
       <CardHeader className="flex  items-center justify-between pb-2">
@@ -30,7 +50,7 @@ const BalanceCard = ({ balance }) => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          ${balance}
+          ${displayedBalance}
         </motion.div>
       </CardContent>
     </Card>
