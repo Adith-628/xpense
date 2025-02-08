@@ -35,7 +35,7 @@ const TransactionPage = () => {
   const [transactions, setTransactions] = useState([]);
 
   return (
-    <div className="flex relative min-h-screen overflow-y-auto flex-col flex-1 gap-4 px-4 font-urbanist">
+    <div className="flex relative min-h-dvh pb-14 overflow-y-auto flex-col flex-1 gap-4 px-4 font-urbanist">
       <div className="font-fira flex py-4 justify-between items-center">
         {/* <div className="text-4xl flex items-center gap-1.5 py-4 ">
           <span className="text-slate-500 tracking-tight">
