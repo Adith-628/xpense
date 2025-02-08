@@ -65,3 +65,17 @@ export async function getBalance(userId) {
     throw error;
   }
 }
+
+export async function getSpend(userId) {
+  try {
+    const { data, error } = await supabase
+      .from("users")
+      .select("total_spend")
+      .eq("id", userId);
+    if (error) throw error;
+    return data[0].total_spend;
+  } catch (error) {
+    console.error("Error getting spend: ", error);
+    throw error;
+  }
+}

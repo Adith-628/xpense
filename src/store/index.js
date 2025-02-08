@@ -4,6 +4,7 @@ import {
   addTransaction as addTransactionToSupabase,
   getTransactions as getTransactionsFromSupabase,
   getBalance as getBalanceFromSupabase,
+  getSpend,
 } from "@/utils/database";
 
 export const useStore = create(
@@ -11,6 +12,7 @@ export const useStore = create(
     (set, get) => ({
       user: null,
       total_balance: 0,
+      total_spend: 0,
       transactions: [],
       setUser: (user) => set({ user }),
       addTransaction: async (transaction) => {
@@ -47,6 +49,13 @@ export const useStore = create(
 
         const balance = await getBalanceFromSupabase(user.id);
         set({ total_balance: balance });
+      },
+      fetchSpend: async () => {
+        const { user } = get();
+        if (!user) return;
+
+        const spend = await getSpend(user.id);
+        set({ total_spend: spend });
       },
     }),
     {

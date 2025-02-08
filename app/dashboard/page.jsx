@@ -15,7 +15,8 @@ import Header from "@/src/components/organisms/Header";
 const TransactionPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [transaction, setTransaction] = useState([]);
-  const { user, fetchBalance, total_balance } = useStore();
+  const { user, fetchBalance, total_spend, fetchSpend, total_balance } =
+    useStore();
   // const displayedBalance = 0;
 
   const [userName, setUserName] = useState("");
@@ -28,6 +29,7 @@ const TransactionPage = () => {
 
   useEffect(() => {
     fetchBalance();
+    fetchSpend();
   }, []);
 
   const [transactions, setTransactions] = useState([]);
@@ -63,7 +65,7 @@ const TransactionPage = () => {
       </div>
 
       <div className="">
-        <BalanceCard balance={total_balance} />
+        <BalanceCard balance={total_balance} spend={total_spend} />
       </div>
 
       {/* <DailyExpense transactions={transactions} /> */}
