@@ -12,6 +12,11 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { motion } from "framer-motion";
+import { DockDemo } from "@/src/components/molecules/Footer";
+import TransationsTable from "@/src/components/organisms/TransationsTable";
+import DailyExpense from "@/src/components/organisms/DailyExpenses";
+import BalanceCard from "@/src/components/molecules/BalanceCard";
+import TransactionCard from "@/src/components/molecules/TransactionCard";
 
 const TransactionPage = () => {
   const dispatch = useDispatch();
@@ -33,6 +38,7 @@ const TransactionPage = () => {
     const response = await getUserTransactions("xnzZNrWNO48O5Vx3Ha5y");
     if (response.status === "success") {
       setTransactions(response.data); // Assuming response.data is an array
+      console.log("Transactions fetched successfully", response.data);
     } else {
       console.log("Error fetching transactions", response.error);
     }
@@ -84,7 +90,7 @@ const TransactionPage = () => {
   }, [balance, status]);
 
   return (
-    <div className="flex h-screen flex-col overflow-y-auto flex-1 gap-4 px-2 font-urbanist">
+    <div className="flex relative min-h-screen overflow-y-auto flex-col flex-1 gap-4 px-4 font-urbanist">
       <div className="font-fira flex py-4 justify-between items-center">
         <div className="text-4xl flex items-center gap-1.5 py-4 ">
           <span className="text-slate-500 tracking-tight">Hi,{""}</span>
@@ -110,14 +116,7 @@ const TransactionPage = () => {
       </div>
 
       {/* Balance Card */}
-      <div className="border-gray-600 relative border flex justify-start gap-4 flex-col  w-60 h-40 p-4 rounded-2xl hover:scale-105 transition-all duration-200">
-        <div className="text-xl font-semibold flex items-center justify-between ">
-          <div className="">Account</div>
-          <div className="absolute right-2 top-1.5">
-            <Image src="/wallet3.png" width={35} height={35} alt="visa" />
-          </div>
-        </div>
-        <div className="">
+      {/* <div className="">
           Balance:{" "}
           <span>
             {status === "loading" ? (
@@ -135,40 +134,20 @@ const TransactionPage = () => {
               "Fetching..."
             )}
           </span>
-        </div>
+        </div> */}
+      <div className="">
+        <BalanceCard balance={displayedBalance} />
       </div>
 
-      <div className="">
-        <h1 className="font-urbanist">
-          Balance:{" "}
-          {status == "loading"
-            ? "loading.."
-            : balance !== null
-            ? `$${balance}`
-            : "Fetching..."}
-        </h1>
-      </div>
-      <div className="flex flex-col">
-        <div className="p-0.5">Transactions</div>
-        <div className="overflow-y-auto">
-          {Array.isArray(transactions) && transactions.length > 0 ? (
+      {/* <DailyExpense transactions={transactions} /> */}
+      {/* <TransationsTable transactions={transactions} /> */}
+      <div className="flex flex-col gap-4">
+        <div className="font-bold text-lg"> Transactions</div>
+        <div className="flex flex-col gap-2">
+          {transactions.length > 0 &&
             transactions.map((transaction, index) => (
-              <div
-                key={index}
-                className="flex gap-2 p-2  border-b justify-between"
-              >
-                <div>{transaction.name}</div>
-                <div>{transaction.amount}</div>
-                <div className="">{transaction.type}</div>
-                <Trash2Icon
-                  className="cursor-pointer"
-                  onClick={() => handleDelete(transaction)}
-                />
-              </div>
-            ))
-          ) : (
-            <p>No transactions found.</p>
-          )}
+              <TransactionCard key={index} transaction={transaction} />
+            ))}
         </div>
       </div>
       <div className="">
@@ -180,6 +159,7 @@ const TransactionPage = () => {
           fetchTransactions={fetchTransactions}
         />
       </div>
+      {/* <DockDemo /> */}
     </div>
   );
 };

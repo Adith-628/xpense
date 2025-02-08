@@ -77,9 +77,9 @@ const AddTransaction = ({ isOpen, setIsOpen, balance, fetchTransactions }) => {
               <option value="" disabled>
                 Select a category
               </option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="system">System</option>
+              <option value="need">Need</option>
+              <option value="want">Want</option>
+              <option value="investment">Investment</option>
             </select>
             {errors.category && (
               <p className="text-red-500">{errors.category.message}</p>
