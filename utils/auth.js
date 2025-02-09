@@ -33,8 +33,6 @@ export async function signIn(email, password) {
         phone: profile.phone || "",
         address: profile.address || "",
       });
-
-      await useStore.getState().fetchTransactions();
     }
   } catch (error) {
     console.error("Error signing in: ", error);
@@ -89,8 +87,6 @@ export async function signUp(email, password, name, phone, address) {
         phone,
         address,
       });
-
-      await useStore.getState().fetchTransactions();
     }
   } catch (error) {
     console.error("Error signing up: ", error);
@@ -108,7 +104,6 @@ export async function initAuth() {
       id: session.user.id,
       email: session.user.email || "",
     });
-    await useStore.getState().fetchTransactions();
   }
 
   // Listen for auth changes
@@ -118,9 +113,29 @@ export async function initAuth() {
         id: session.user.id,
         email: session.user.email || "",
       });
-      await useStore.getState().fetchTransactions();
     } else {
       useStore.getState().setUser(null);
     }
   });
+
+  if (session?.user) {
+    const { data: profile, error: profileError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", session.user.id)
+      .single();
+
+    if (profileError) {
+      console.error("Error fetching profile:", profileError);
+      throw profileError;
+    }
+    useStore.getState().setUser({
+      id: session.user.id,
+      email: session.user.email || "",
+      name: profile.name || "",
+      phone: profile.phone || "",
+      address: profile.address || "",
+      total_balance: profile.total_balance || "",
+    });
+  }
 }

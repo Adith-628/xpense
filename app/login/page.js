@@ -7,7 +7,6 @@ const page = () => {
   useEffect(() => {
     initAuth();
   }, []);
-
   return (
     <div>
       <LoginForm />

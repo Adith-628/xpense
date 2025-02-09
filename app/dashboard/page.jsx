@@ -14,8 +14,6 @@ import Header from "@/src/components/organisms/Header";
 import Chart from "@/src/components/organisms/Chart";
 
 const HomePage = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [transaction, setTransaction] = useState([]);
   const { user, fetchBalance, total_spend, fetchSpend, total_balance } =
     useStore();
   // const displayedBalance = 0;
@@ -25,7 +23,6 @@ const HomePage = () => {
     if (user) {
       setUserName(user.name);
     }
-    console.log("user", user);
   }, [user]);
 
   useEffect(() => {

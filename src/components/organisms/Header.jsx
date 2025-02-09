@@ -2,12 +2,18 @@
 
 import { useStore } from "@/src/store";
 import { useRouter } from "next/navigation";
-import { signOut } from "@/utils/auth";
+import { initAuth, signOut } from "@/utils/auth";
 import Image from "next/image";
+import { useEffect } from "react";
 
 export default function Header() {
   const router = useRouter();
   const { user } = useStore();
+  console.log(user);
+
+  useEffect(() => {
+    initAuth();
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
