@@ -5,10 +5,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { DollarSign, IndianRupee } from "lucide-react";
 import Image from "next/image";
+import { useStore } from "@/src/store";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const BalanceCard = ({ balance, spend }) => {
   const [displayedBalance, setDisplayedBalance] = useState(0);
   const [displayedSpend, setDisplayedSpend] = useState(0);
+  const { fetchDebits, debits } = useStore();
+  const [duration, setDuration] = useState("");
+
+  useEffect(() => {
+    fetchDebits();
+  }, []);
+
+  useEffect(() => {
+    debits?.map((debit) => {
+      if (debit.period == duration) {
+        setDisplayedSpend(debit.total);
+      }
+    });
+  }, [duration]);
 
   useEffect(() => {
     if (balance !== null) {
@@ -63,8 +85,8 @@ const BalanceCard = ({ balance, spend }) => {
       </CardHeader>
       <CardContent className="flex w-full gap-10">
         <div className="">
-          <CardTitle className="text-sm font-medium text-gray-500">
-            Current Balance
+          <CardTitle className="text-md font-medium text-gray-500">
+            Balance
           </CardTitle>
           <motion.div
             className="text-5xl flex items-center font-semibold my-2"
@@ -76,10 +98,27 @@ const BalanceCard = ({ balance, spend }) => {
             <div className="">{displayedBalance}</div>
           </motion.div>
         </div>
-        <div className="">
-          <CardTitle className="text-sm font-medium text-gray-500">
-            Total Spend
+        {/* <div className="flex-1">
+          <CardTitle className="text-md flex justify-between w-full items-center gap-2 font-medium text-gray-500">
+            <div className="">Spend</div>
+            <Select onValueChange={setDuration} className="w-[80px] text-xs ">
+              <SelectTrigger className="w-fit h-fit py-1 px-2 text-xs rounded-full focus:outline-indigo-200 focus:ring-0 focus:outline-none">
+                <SelectValue placeholder="Monthly" />
+              </SelectTrigger>
+              <SelectContent className="w-fit  rounded-xl">
+                <SelectItem value="daily" className="rounded-lg text-xs">
+                  Daily
+                </SelectItem>
+                <SelectItem value="weekly" className="rounded-lg text-xs">
+                  Weekly
+                </SelectItem>
+                <SelectItem value="monthly" className="rounded-lg text-xs">
+                  Monthly
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </CardTitle>
+
           <motion.div
             className="text-5xl flex items-center font-semibold my-2"
             initial={{ opacity: 0 }}
@@ -90,7 +129,7 @@ const BalanceCard = ({ balance, spend }) => {
 
             <div className="">{displayedSpend}</div>
           </motion.div>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

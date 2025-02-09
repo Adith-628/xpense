@@ -7,6 +7,7 @@ import {
   getSpend,
   getRecentTransactions,
   getExpenseStatistics,
+  getDebitTotals,
 } from "@/utils/database";
 
 export const useStore = create(
@@ -18,6 +19,7 @@ export const useStore = create(
       stats: [],
       recent_transactions: [],
       transactions: [],
+      debits: [],
       setUser: (user) => set({ user }),
       addTransaction: async (transaction) => {
         const { user } = get();
@@ -76,6 +78,14 @@ export const useStore = create(
         const stats = await getExpenseStatistics(user.id);
         console.log("stats---", stats);
         set({ stats });
+      },
+      fetchDebits: async () => {
+        const { user } = get();
+        if (!user) return;
+
+        const debits = await getDebitTotals(user.id);
+        console.log("debits---", debits);
+        set({ debits });
       },
     }),
     {

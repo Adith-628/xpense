@@ -102,10 +102,24 @@ export async function getExpenseStatistics(userId) {
       user_id_input: userId,
     });
     if (error) throw error;
-    console.log("data----", data);
     return data;
   } catch (error) {
     console.error("Error getting expense statistics: ", error);
     throw error;
   }
 }
+
+export const getDebitTotals = async (userId) => {
+  try {
+    const { data, error } = await supabase.rpc("get_debit_totals", {
+      user_id_input: userId,
+    });
+
+    if (error) throw error;
+
+    return data; // Returns an array of daily, weekly, and monthly totals
+  } catch (err) {
+    console.error("Error fetching debit totals:", err);
+    return null;
+  }
+};

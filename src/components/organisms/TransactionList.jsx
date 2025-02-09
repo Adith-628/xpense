@@ -3,6 +3,7 @@
 import { useStore } from "@/src/store";
 import TransactionCard from "../molecules/TransactionCard";
 import { useEffect } from "react";
+import Link from "next/link";
 
 export default function TransactionList() {
   const {
@@ -21,15 +22,18 @@ export default function TransactionList() {
     <div className="bg-white rounded-lg flex flex-col px-2 gap-2 py-2 my-2">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold ">Recent Transactions</h2>
-        <h2 className="text-xs bg-[#ECEBFF] p-1 rounded-full px-2  text-gray-500">
+        <Link
+          href={"/transactions"}
+          className="text-xs bg-[#ECEBFF] border border-indigo-400/20 p-1 rounded-full px-2  text-gray-500"
+        >
           view all
-        </h2>
+        </Link>
       </div>
-      <ul className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         {recent_transactions.map((transaction) => (
           <TransactionCard transaction={transaction} />
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

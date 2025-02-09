@@ -13,7 +13,7 @@ import AddTransactionButton from "@/src/components/organisms/AddTransactionButto
 import Header from "@/src/components/organisms/Header";
 import Chart from "@/src/components/organisms/Chart";
 
-const TransactionPage = () => {
+const HomePage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [transaction, setTransaction] = useState([]);
   const { user, fetchBalance, total_spend, fetchSpend, total_balance } =
@@ -97,4 +97,4 @@ const TransactionPage = () => {
   );
 };
 
-export default TransactionPage;
+export default HomePage;
