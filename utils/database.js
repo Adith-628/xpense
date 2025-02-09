@@ -95,3 +95,17 @@ export async function getRecentTransactions(userId, limit) {
     throw error;
   }
 }
+
+export async function getExpenseStatistics(userId) {
+  try {
+    const { data, error } = await supabase.rpc("get_total_by_category", {
+      user_id_input: userId,
+    });
+    if (error) throw error;
+    console.log("data----", data);
+    return data;
+  } catch (error) {
+    console.error("Error getting expense statistics: ", error);
+    throw error;
+  }
+}

@@ -6,6 +6,7 @@ import {
   getBalance as getBalanceFromSupabase,
   getSpend,
   getRecentTransactions,
+  getExpenseStatistics,
 } from "@/utils/database";
 
 export const useStore = create(
@@ -14,6 +15,7 @@ export const useStore = create(
       user: null,
       total_balance: 0,
       total_spend: 0,
+      stats: [],
       recent_transactions: [],
       transactions: [],
       setUser: (user) => set({ user }),
@@ -66,6 +68,14 @@ export const useStore = create(
 
         const spend = await getSpend(user.id);
         set({ total_spend: spend });
+      },
+      fetchStats: async () => {
+        const { user } = get();
+        if (!user) return;
+
+        const stats = await getExpenseStatistics(user.id);
+        console.log("stats---", stats);
+        set({ stats });
       },
     }),
     {

@@ -9,11 +9,17 @@ import {
   Tooltip,
 } from "recharts";
 import { useStore } from "@/src/store";
+import { useEffect } from "react";
 
 const COLORS = ["#3730A390", "#00C49F", "#FFBB28"];
 
 export default function Chart() {
-  const { transactions } = useStore();
+  const { transactions, stats, fetchStats } = useStore();
+  console.log("stats", stats);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
   const data = [
     { name: "Investment", value: 0 },
