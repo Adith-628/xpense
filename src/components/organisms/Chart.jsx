@@ -10,15 +10,15 @@ import {
 } from "recharts";
 import { useStore } from "@/src/store";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28"];
+const COLORS = ["#3730A390", "#00C49F", "#FFBB28"];
 
 export default function Chart() {
   const { transactions } = useStore();
 
   const data = [
+    { name: "Investment", value: 0 },
     { name: "Need", value: 0 },
     { name: "Want", value: 0 },
-    { name: "Investment", value: 0 },
   ];
 
   transactions.forEach((transaction) => {
@@ -29,8 +29,8 @@ export default function Chart() {
   });
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">Spending Insights</h2>
+    <div className="bg-[#E9F6F6] rounded-lg shadow-md p-6">
+      <h2 className="text-xl font-semibold mb-2">Satistics</h2>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
@@ -45,11 +45,20 @@ export default function Chart() {
             {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
+                className="focus:outline-none"
                 fill={COLORS[index % COLORS.length]}
               />
             ))}
           </Pie>
-          <Tooltip />
+          <Tooltip
+            labelStyle={{ color: "black", fontSize: "14px" }}
+            contentStyle={{
+              borderRadius: "8px",
+              padding: "5px",
+              fontSize: "14px",
+            }}
+            className="rounded-lg"
+          />
           <Legend />
         </PieChart>
       </ResponsiveContainer>

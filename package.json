@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:local": "next dev -H 192.168.1.40",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -16,6 +17,7 @@
     "apexcharts": "^4.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "firebase": "^11.0.2",
     "framer-motion": "^11.13.5",
     "lucide-react": "^0.468.0",

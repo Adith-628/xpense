@@ -79,3 +79,19 @@ export async function getSpend(userId) {
     throw error;
   }
 }
+
+export async function getRecentTransactions(userId, limit) {
+  try {
+    const { data, error } = await supabase
+      .from("transactions")
+      .select("*")
+      .eq("user_id", userId)
+      .order("date", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error getting recent transactions: ", error);
+    throw error;
+  }
+}

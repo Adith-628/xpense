@@ -49,10 +49,10 @@ const BalanceCard = ({ balance, spend }) => {
   }, [spend]);
 
   return (
-    <Card>
+    <Card className="rounded-2xl bg-[#ECEBFF]/50">
       <CardHeader className="flex  items-center justify-between pb-2">
         <div className="flex w-full items-center justify-between">
-          <div className="text-xl font-semibold">Account</div>
+          <div className="text-3xl font-semibold">Account</div>
           <div className="">
             <Image src="/wallet3.png" width={35} height={35} alt="visa" />
           </div>

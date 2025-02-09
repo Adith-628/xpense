@@ -5,33 +5,28 @@ import TransactionCard from "../molecules/TransactionCard";
 import { useEffect } from "react";
 
 export default function TransactionList() {
-  const { transactions, fetchTransactions } = useStore();
+  const {
+    transactions,
+    recent_transactions,
+    fetchTransactions,
+    fetchRecentTransactions,
+  } = useStore();
 
   useEffect(() => {
     fetchTransactions();
+    fetchRecentTransactions();
   }, []);
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-      <h2 className="text-xl font-semibold mb-4">Expense History</h2>
-      <ul className="space-y-4">
-        {transactions.map((transaction) => (
-          // <li
-          //   key={transaction.id}
-          //   className="flex justify-between items-center"
-          // >
-          //   <div>
-          //     <p className="font-medium">{transaction.description}</p>
-          //     <p className="text-sm text-gray-500">{transaction.category}</p>
-          //   </div>
-          //   <span
-          //     className={`font-semibold ${
-          //       transaction.amount < 0 ? "text-red-600" : "text-green-600"
-          //     }`}
-          //   >
-          //     ${Math.abs(transaction.amount).toFixed(2)}
-          //   </span>
-          // </li>
+    <div className="bg-white rounded-lg flex flex-col px-2 gap-2 py-2 my-2">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-semibold ">Recent Transactions</h2>
+        <h2 className="text-xs bg-[#ECEBFF] p-1 rounded-full px-2  text-gray-500">
+          view all
+        </h2>
+      </div>
+      <ul className="flex flex-col gap-2">
+        {recent_transactions.map((transaction) => (
           <TransactionCard transaction={transaction} />
         ))}
       </ul>

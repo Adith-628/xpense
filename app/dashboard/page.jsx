@@ -11,6 +11,7 @@ import TransactionList from "@/src/components/organisms/TransactionList";
 import AddTransactionModal from "@/src/components/organisms/AddTransactionModal";
 import AddTransactionButton from "@/src/components/organisms/AddTransactionButton";
 import Header from "@/src/components/organisms/Header";
+import Chart from "@/src/components/organisms/Chart";
 
 const TransactionPage = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,8 +36,8 @@ const TransactionPage = () => {
   const [transactions, setTransactions] = useState([]);
 
   return (
-    <div className="flex relative min-h-dvh pb-14 overflow-y-auto flex-col flex-1 gap-4 px-4 font-urbanist">
-      <div className="font-fira flex py-4 justify-between items-center">
+    <div className="flex relative min-h-dvh pb-14 overflow-y-auto flex-col flex-1 gap-4 p-2 px-4 font-urbanist">
+      <div className="font-fira flex justify-between items-center">
         {/* <div className="text-4xl flex items-center gap-1.5 py-4 ">
           <span className="text-slate-500 tracking-tight">
             Hi,{""}
@@ -68,9 +69,11 @@ const TransactionPage = () => {
         <BalanceCard balance={total_balance} spend={total_spend} />
       </div>
 
+      <Chart />
       {/* <DailyExpense transactions={transactions} /> */}
       <TransactionList />
       <AddTransactionButton />
+
       {/* <div className="flex flex-col gap-4">
         <div className="font-bold text-lg"> Transactions</div>
         <div className="flex flex-col gap-2">

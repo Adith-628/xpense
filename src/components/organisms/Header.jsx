@@ -16,10 +16,21 @@ export default function Header() {
 
   return (
     <header className="bg-white border-b w-full">
-      <div className="w-full font-fira  px-4 py-4 flex justify-between items-center">
-        <div className="flex items-end space-x-1">
-          <h1 className="text-3xl font-bold text-gray-800">Hi, </h1>
-          <span className="text-gray-600 text-3xl">{user?.name}</span>
+      <div className="w-full  px-2 py-2 flex justify-between items-center">
+        <div className="flex  items-center gap-4">
+          <div className="">
+            <Image
+              className="rounded-full object-contain"
+              src={"/profile.jpg"}
+              alt="profile"
+              width={40}
+              height={40}
+            />
+          </div>
+          <div className="font-urbanist ">
+            <h3 className="text-xs text-gray-800">Welcome! </h3>
+            <h1 className="text-lg font-bold text-gray-900 ">{user?.name}</h1>
+          </div>
         </div>
         <div className="flex items-center space-x-4">
           <button
@@ -28,13 +39,6 @@ export default function Header() {
           >
             Sign Out
           </button>
-          <Image
-            className="rounded-full object-contain"
-            src={"/profile.jpg"}
-            alt="profile"
-            width={50}
-            height={50}
-          />
         </div>
       </div>
     </header>
