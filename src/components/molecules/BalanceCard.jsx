@@ -98,7 +98,7 @@ const BalanceCard = ({ balance, spend }) => {
             <div className="">{displayedBalance}</div>
           </motion.div>
         </div>
-        {/* <div className="flex-1">
+        <div className="flex-1">
           <CardTitle className="text-md flex justify-between w-full items-center gap-2 font-medium text-gray-500">
             <div className="">Spend</div>
             <Select onValueChange={setDuration} className="w-[80px] text-xs ">
@@ -129,7 +129,7 @@ const BalanceCard = ({ balance, spend }) => {
 
             <div className="">{displayedSpend}</div>
           </motion.div>
-        </div> */}
+        </div>
       </CardContent>
     </Card>
   );
