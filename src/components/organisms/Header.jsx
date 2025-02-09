@@ -27,15 +27,15 @@ export default function Header() {
               height={40}
             />
           </div>
-          <div className="font-urbanist ">
-            <h3 className="text-xs text-gray-800">Welcome! </h3>
-            <h1 className="text-lg font-bold text-gray-900 ">{user?.name}</h1>
+          <div className="font-urbanist flex flex-col leading-4 ">
+            <span className="text-xs">Welcome!</span>
+            <span className="text-md font-semibold">{user?.name}</span>
           </div>
         </div>
         <div className="flex items-center space-x-4">
           <button
             onClick={handleSignOut}
-            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="px-4 py-2 border border-transparent rounded-2xl shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Sign Out
           </button>
