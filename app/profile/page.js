@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useStore } from "@/src/store"; // Import Zustand store
-import { supabase } from "@/supabase"; // Import Supabase client
 import Image from "next/image";
+import { useStore } from "@/src/store";
+import { supabase } from "@/utils/supabase";
 
 const UserProfile = () => {
   const { user, setUser } = useStore(); // Zustand store for global state
