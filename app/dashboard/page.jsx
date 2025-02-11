@@ -33,43 +33,16 @@ const HomePage = () => {
   const [transactions, setTransactions] = useState([]);
 
   return (
-    <div className="flex relative min-h-dvh pb-14 overflow-y-auto flex-col flex-1 gap-4 p-2 px-4 font-urbanist">
-      <div className="font-fira flex justify-between items-center">
-        {/* <div className="text-4xl flex items-center gap-1.5 py-4 ">
-          <span className="text-slate-500 tracking-tight">
-            Hi,{""}
-            {userName}{" "}
-          </span>
-          <span className="font-bold text-slate-950">
-            <TextGenerateEffect
-              className="font-bold text-4xl"
-              duration={1}
-              filter={false}
-              words={userName}
-            />
-          </span>
-        </div> */}
-        <Header />
-        <div className="">
-          {/* profile image */}
-          {/* <Image
-            className="rounded-full object-contain"
-            src={user?.photoURL}
-            alt="profile"
-            width={50}
-            height={50}
-          /> */}
-        </div>
-      </div>
-
+    <div className="flex relative min-h-dvh pb-4 overflow-y-auto flex-col flex-1 gap-4 p-2 px-4 font-urbanist">
+      <Header />
       <div className="">
         <BalanceCard balance={total_balance} spend={total_spend} />
       </div>
 
-      <Chart />
+      {/* <Chart /> */}
       {/* <DailyExpense transactions={transactions} /> */}
       <TransactionList />
-      <AddTransactionButton />
+      {/* <AddTransactionButton /> */}
 
       {/* <div className="flex flex-col gap-4">
         <div className="font-bold text-lg"> Transactions</div>

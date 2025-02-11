@@ -1,4 +1,5 @@
 "use client";
+import FloatingNavBar from "@/src/components/molecules/NavBar";
 import TransactionCard from "@/src/components/molecules/TransactionCard";
 import Header from "@/src/components/organisms/Header";
 import { useStore } from "@/src/store";
@@ -24,6 +25,8 @@ const TransactionsPage = () => {
           ))}
         </div>
       </div>
+
+      <FloatingNavBar />
     </div>
   );
 };

@@ -1,3 +1,10 @@
+import FloatingNavBar from "@/src/components/molecules/NavBar";
+
 export default function Layout({ children }) {
-  return <div>{children}</div>;
+  return (
+    <div>
+      {children}
+      <FloatingNavBar />
+    </div>
+  );
 }
