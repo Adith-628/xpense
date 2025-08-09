@@ -32,6 +32,10 @@ export const useStore = create(
       dashboardInitialized: false,
       setDashboardInitialized: (value) => set({ dashboardInitialized: value }),
 
+      // Transactions page initialization flag
+      transactionsInitialized: false,
+      setTransactionsInitialized: (value) => set({ transactionsInitialized: value }),
+
       // Pagination and filters
       pagination: {
         total: 0,
@@ -61,6 +65,7 @@ export const useStore = create(
         set({
           user,
           dashboardInitialized: false, // Reset dashboard initialization when user changes
+          transactionsInitialized: false, // Reset transactions initialization when user changes
         });
       },
       setLoading: (loading) => set({ loading }),
@@ -90,6 +95,7 @@ export const useStore = create(
             stats: [],
             debits: [],
             dashboardInitialized: false, // Reset dashboard initialization on signout
+            transactionsInitialized: false, // Reset transactions initialization on signout
             transactionStats: {
               totalIncome: 0,
               totalExpenses: 0,
@@ -313,6 +319,27 @@ export const useStore = create(
           ]);
         } catch (error) {
           console.error("Error initializing dashboard:", error);
+        }
+      },
+
+      // Transactions page initialization - fetches transaction data
+      initializeTransactions: async (filters = {}) => {
+        const {
+          user,
+          transactionsInitialized,
+          setTransactionsInitialized,
+          fetchTransactions,
+        } = get();
+
+        if (!user) return;
+        if (transactionsInitialized) return; // ✅ Prevent re-runs
+
+        setTransactionsInitialized(true); // Mark as initialized before fetching
+
+        try {
+          await fetchTransactions(filters);
+        } catch (error) {
+          console.error("Error initializing transactions:", error);
         }
       },
 

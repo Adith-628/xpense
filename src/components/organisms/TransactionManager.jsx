@@ -7,12 +7,9 @@ import TransactionFilters from "./TransactionFilters";
 import TransactionStats from "./TransactionStats";
 
 const TransactionManager = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [filteredTransactions, setFilteredTransactions] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState(null);
-  const [filters, setFilters] = useState({
+  const [localFilters, setLocalFilters] = useState({
     category: "",
     transaction_type: "",
     start_date: "",
@@ -20,60 +17,59 @@ const TransactionManager = () => {
     limit: 50,
     offset: 0,
   });
-  const [pagination, setPagination] = useState({
-    limit: 50,
-    offset: 0,
-    total: 0,
-  });
 
-  const { user } = useStore();
+  const {
+    user,
+    transactions,
+    loading,
+    pagination,
+    filters,
+    setFilters,
+    fetchTransactions,
+    initializeTransactions,
+    transactionsInitialized,
+  } = useStore();
 
-  // Fetch transactions based on filters
-  const fetchTransactions = useCallback(
-    async (newFilters = filters) => {
-      if (!user) return;
+  // Initialize transactions data when user is available
+  const initializeTransactionsData = useCallback(() => {
+    if (user?.id && initializeTransactions) {
+      initializeTransactions(localFilters);
+    }
+  }, [user?.id, initializeTransactions, localFilters]);
 
-      setLoading(true);
-      try {
-        // Clean up filters - remove empty values
-        const cleanFilters = Object.entries(newFilters).reduce(
-          (acc, [key, value]) => {
-            if (value !== "" && value !== null && value !== undefined) {
-              acc[key] = value;
-            }
-            return acc;
-          },
-          {}
-        );
+  useEffect(() => {
+    initializeTransactionsData();
+  }, [initializeTransactionsData]);
 
-        const response = await transactionAPI.getTransactions(cleanFilters);
-
-        if (response.success) {
-          setTransactions(response.data || []);
-          setFilteredTransactions(response.data || []);
-          if (response.pagination) {
-            setPagination(response.pagination);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching transactions:", error);
-      } finally {
-        setLoading(false);
+  // Handle filter changes
+  const handleFilterChange = useCallback(
+    (newFilters) => {
+      const updatedFilters = { ...localFilters, ...newFilters, offset: 0 };
+      setLocalFilters(updatedFilters);
+      setFilters(updatedFilters);
+      
+      // Only fetch if transactions are already initialized (to avoid duplicate calls)
+      if (transactionsInitialized) {
+        fetchTransactions(updatedFilters);
       }
     },
-    [user, filters]
+    [localFilters, setFilters, fetchTransactions, transactionsInitialized]
   );
 
-  // Create new transaction
+  // Create new transaction - using store function
+  const { addTransaction } = useStore();
+  
   const createTransaction = async (transactionData) => {
     try {
-      const response = await transactionAPI.createTransaction(transactionData);
-
-      if (response.success) {
-        await fetchTransactions(); // Refresh list
-        setShowForm(false);
-        return response;
+      const response = await addTransaction(transactionData);
+      setShowForm(false);
+      
+      // Refresh transactions list
+      if (transactionsInitialized) {
+        await fetchTransactions(localFilters);
       }
+      
+      return response;
     } catch (error) {
       console.error("Error creating transaction:", error);
       throw error;
