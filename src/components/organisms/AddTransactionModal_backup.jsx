@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useStore } from "@/src/store";
+import { useState } from "react";
+import { useStore } from "@/store";
 import {
   Select,
   SelectContent,
@@ -11,24 +11,15 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 
-export default function AddTransactionModal({
-  isOpen,
-  onClose,
-  defaultType = "expense",
-}) {
+export default function AddTransactionModal({ isOpen, onClose }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("Food & Dining");
-  const [transactionType, setTransactionType] = useState(defaultType);
+  const [transactionType, setTransactionType] = useState("expense");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { addTransaction } = useStore();
-
-  // Update transaction type when defaultType changes
-  useEffect(() => {
-    setTransactionType(defaultType);
-  }, [defaultType]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

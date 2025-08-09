@@ -22,6 +22,8 @@ const HomePage = () => {
 
   const [userName, setUserName] = useState("");
   const [isAddTransactionOpen, setIsAddTransactionOpen] = useState(false);
+  const [defaultTransactionType, setDefaultTransactionType] =
+    useState("expense");
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
 
   useEffect(() => {
@@ -54,7 +56,8 @@ const HomePage = () => {
     recent_transactions.length === 0 &&
     !hasSeenOnboarding;
 
-  const handleAddTransaction = () => {
+  const handleAddTransaction = (type = "expense") => {
+    setDefaultTransactionType(type);
     setIsAddTransactionOpen(true);
     // Mark onboarding as seen when user tries to add their first transaction
     if (user && !hasSeenOnboarding) {
@@ -90,45 +93,97 @@ const HomePage = () => {
   }
 
   return (
-    <div className="flex relative min-h-dvh pb-4 overflow-y-auto flex-col flex-1 gap-4 p-2 px-4 font-urbanist">
-      <Header />
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
+      <div className="flex relative min-h-dvh pb-4 overflow-y-auto flex-col flex-1 gap-4 p-3 md:p-4 font-urbanist max-w-7xl mx-auto">
+        <Header />
 
-      {isNewUser ? (
-        // Show onboarding for new users with no transactions
-        <div className="mt-4">
-          <NewUserOnboarding onAddTransaction={handleAddTransaction} />
-        </div>
-      ) : (
-        // Show normal dashboard for users with data
-        <>
-          {/* Welcome Message */}
-          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg p-4 text-white">
-            <h1 className="text-2xl font-bold">Welcome back, {userName}!</h1>
-            <p className="text-indigo-100 mt-1">
-              Here's your financial overview
-            </p>
+        {isNewUser ? (
+          // Show onboarding for new users with no transactions
+          <div className="mt-4">
+            <NewUserOnboarding onAddTransaction={handleAddTransaction} />
           </div>
+        ) : (
+          // Show normal dashboard for users with data
+          <>
+            {/* Welcome Message */}
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 rounded-2xl p-4 md:p-5 text-white shadow-xl border border-white/20">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h1 className="text-xl md:text-2xl font-bold mb-1">
+                    Welcome back, {userName}! 👋
+                  </h1>
+                  <p className="text-indigo-100 text-sm md:text-base">
+                    Here's your financial overview for today
+                  </p>
+                </div>
+                <div className="mt-2 md:mt-0">
+                  <div className="text-right">
+                    <p className="text-indigo-200 text-xs">
+                      {new Date().toLocaleDateString("en-US", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-          {/* Balance Card */}
-          <div className="">
-            <BalanceCard balance={total_balance} spend={total_spend} />
-          </div>
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+              {/* Left Column - Balance Card */}
+              <div className="lg:col-span-8">
+                <BalanceCard
+                  balance={total_balance}
+                  spend={total_spend}
+                  onAddTransaction={handleAddTransaction}
+                />
+              </div>
 
-          {/* Transaction Statistics */}
-          <TransactionStats />
+              {/* Right Column - Quick Stats */}
+              <div className="lg:col-span-4">
+                <TransactionStats />
+              </div>
+            </div>
 
-          {/* Chart Component */}
-          <Chart />
+            {/* Chart and Recent Transactions */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+              {/* Chart Section */}
+              <div className="xl:col-span-7">
+                <Chart />
+              </div>
 
-          {/* Recent Transactions */}
-          <TransactionList />
-        </>
-      )}
+              {/* Recent Transactions Section */}
+              <div className="xl:col-span-5">
+                <div className="bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300 h-full">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-bold text-gray-900">
+                      Recent Transactions
+                    </h2>
+                    <button
+                      onClick={() => handleAddTransaction("expense")}
+                      className="px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-xs font-medium"
+                    >
+                      Add New
+                    </button>
+                  </div>
+                  <div className="overflow-hidden">
+                    <TransactionList onAddTransaction={handleAddTransaction} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
 
-      {/* Add Transaction Modal */}
+      {/* Global Add Transaction Modal - Outside main container for proper overlay */}
       <AddTransactionModal
         isOpen={isAddTransactionOpen}
         onClose={() => setIsAddTransactionOpen(false)}
+        defaultType={defaultTransactionType}
       />
     </div>
   );

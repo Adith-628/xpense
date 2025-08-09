@@ -28,6 +28,9 @@ const TransactionManager = () => {
     fetchTransactions,
     initializeTransactions,
     transactionsInitialized,
+    addTransaction,
+    updateTransaction: storeUpdateTransaction,
+    deleteTransaction: storeDeleteTransaction,
   } = useStore();
 
   // Initialize transactions data when user is available
@@ -41,34 +44,17 @@ const TransactionManager = () => {
     initializeTransactionsData();
   }, [initializeTransactionsData]);
 
-  // Handle filter changes
-  const handleFilterChange = useCallback(
-    (newFilters) => {
-      const updatedFilters = { ...localFilters, ...newFilters, offset: 0 };
-      setLocalFilters(updatedFilters);
-      setFilters(updatedFilters);
-      
-      // Only fetch if transactions are already initialized (to avoid duplicate calls)
-      if (transactionsInitialized) {
-        fetchTransactions(updatedFilters);
-      }
-    },
-    [localFilters, setFilters, fetchTransactions, transactionsInitialized]
-  );
-
   // Create new transaction - using store function
-  const { addTransaction } = useStore();
-  
   const createTransaction = async (transactionData) => {
     try {
       const response = await addTransaction(transactionData);
       setShowForm(false);
-      
+
       // Refresh transactions list
       if (transactionsInitialized) {
         await fetchTransactions(localFilters);
       }
-      
+
       return response;
     } catch (error) {
       console.error("Error creating transaction:", error);
@@ -76,36 +62,36 @@ const TransactionManager = () => {
     }
   };
 
-  // Update transaction
+  // Update transaction - using store function
   const updateTransaction = async (id, transactionData) => {
     try {
-      const response = await transactionAPI.updateTransaction(
-        id,
-        transactionData
-      );
+      const response = await storeUpdateTransaction(id, transactionData);
+      setEditingTransaction(null);
 
-      if (response.success) {
-        await fetchTransactions(); // Refresh list
-        setEditingTransaction(null);
-        return response;
+      // Refresh transactions list
+      if (transactionsInitialized) {
+        await fetchTransactions(localFilters);
       }
+
+      return response;
     } catch (error) {
       console.error("Error updating transaction:", error);
       throw error;
     }
   };
 
-  // Delete transaction
+  // Delete transaction - using store function
   const deleteTransaction = async (id) => {
     if (!confirm("Are you sure you want to delete this transaction?")) {
       return;
     }
 
     try {
-      const response = await transactionAPI.deleteTransaction(id);
+      await storeDeleteTransaction(id);
 
-      if (response.success) {
-        await fetchTransactions(); // Refresh list
+      // Refresh transactions list
+      if (transactionsInitialized) {
+        await fetchTransactions(localFilters);
       }
     } catch (error) {
       console.error("Error deleting transaction:", error);
@@ -114,24 +100,27 @@ const TransactionManager = () => {
 
   // Handle filter changes
   const handleFilterChange = (newFilters) => {
-    const updatedFilters = { ...filters, ...newFilters, offset: 0 };
+    const updatedFilters = { ...localFilters, ...newFilters, offset: 0 };
+    setLocalFilters(updatedFilters);
     setFilters(updatedFilters);
-    fetchTransactions(updatedFilters);
+
+    // Only fetch if transactions are already initialized (to avoid duplicate calls)
+    if (transactionsInitialized) {
+      fetchTransactions(updatedFilters);
+    }
   };
 
   // Handle pagination
   const handlePageChange = (newOffset) => {
-    const updatedFilters = { ...filters, offset: newOffset };
+    const updatedFilters = { ...localFilters, offset: newOffset };
+    setLocalFilters(updatedFilters);
     setFilters(updatedFilters);
-    fetchTransactions(updatedFilters);
-  };
 
-  // Initial load
-  useEffect(() => {
-    if (user) {
-      fetchTransactions();
+    // Only fetch if transactions are already initialized
+    if (transactionsInitialized) {
+      fetchTransactions(updatedFilters);
     }
-  }, [user]);
+  };
 
   return (
     <div className="space-y-6">
@@ -147,11 +136,11 @@ const TransactionManager = () => {
       </div>
 
       {/* Stats Summary */}
-      <TransactionStats filters={filters} />
+      <TransactionStats filters={localFilters} />
 
       {/* Filters */}
       <TransactionFilters
-        filters={filters}
+        filters={localFilters}
         onFilterChange={handleFilterChange}
         onReset={() => {
           const resetFilters = {
@@ -162,8 +151,13 @@ const TransactionManager = () => {
             limit: 50,
             offset: 0,
           };
+          setLocalFilters(resetFilters);
           setFilters(resetFilters);
-          fetchTransactions(resetFilters);
+
+          // Only fetch if transactions are already initialized
+          if (transactionsInitialized) {
+            fetchTransactions(resetFilters);
+          }
         }}
       />
 
@@ -194,7 +188,7 @@ const TransactionManager = () => {
       {/* Transaction List */}
       {!loading && (
         <TransactionList
-          transactions={filteredTransactions}
+          transactions={transactions}
           onEdit={setEditingTransaction}
           onDelete={deleteTransaction}
           pagination={pagination}

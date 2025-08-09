@@ -1,147 +1,50 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { transactionAPI } from "@/utils/api";
-import {
-  ArrowUpIcon,
-  ArrowDownIcon,
-  DollarSignIcon,
-  HashIcon,
-} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useStore } from "@/src/store";
+import { motion } from "framer-motion";
+import { TrendingUp, TrendingDown, DollarSign, PieChart } from "lucide-react";
 
-const TransactionStats = ({ filters = {} }) => {
-  const [stats, setStats] = useState(null);
-  const [categoryStats, setCategoryStats] = useState([]);
-  const [loading, setLoading] = useState(false);
+const TransactionStats = () => {
+  const { user, transactions = [], loading, dashboardInitialized } = useStore();
+  const [stats, setStats] = useState({
+    totalIncome: 0,
+    totalExpenses: 0,
+    netBalance: 0,
+    transactionCount: 0,
+  });
 
-  // Fetch statistics summary
-  const fetchStats = useCallback(async () => {
-    setLoading(true);
-    try {
-      // Create filter params for stats API with safe access
-      const statsFilters = {};
-      if (filters?.start_date) statsFilters.start_date = filters.start_date;
-      if (filters?.end_date) statsFilters.end_date = filters.end_date;
-
-      // Fetch summary stats
-      const summaryResponse = await transactionAPI.getStatsSummary(
-        statsFilters
-      );
-      if (summaryResponse.success) {
-        setStats(summaryResponse.data);
-      }
-
-      // Fetch category stats
-      const categoryResponse = await transactionAPI.getStatsCategories({
-        ...statsFilters,
-        transaction_type: filters?.transaction_type || undefined,
-      });
-      if (categoryResponse.success) {
-        setCategoryStats(categoryResponse.data || []);
-      }
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters?.start_date, filters?.end_date, filters?.transaction_type]);
-
-  // Refetch when filters change
   useEffect(() => {
-    fetchStats();
-  }, [fetchStats]);
+    if (transactions && transactions.length > 0) {
+      const totalIncome = transactions
+        .filter((t) => t.transaction_type === "income")
+        .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
 
-  // Format currency
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount || 0);
-  };
+      const totalExpenses = transactions
+        .filter((t) => t.transaction_type === "expense")
+        .reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
 
-  // Loading state
+      const netBalance = totalIncome - totalExpenses;
+      const transactionCount = transactions.length;
+
+      setStats({
+        totalIncome,
+        totalExpenses,
+        netBalance,
+        transactionCount,
+      });
+    }
+  }, [transactions]);
+
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 shadow-lg">
         <div className="animate-pulse">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-20 bg-gray-200 rounded"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Empty state for new users
-  if (!stats || stats.transaction_count === 0) {
-    return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="text-center py-8">
-          <div className="mb-4">
-            <svg
-              className="mx-auto h-16 w-16 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
-            No Transaction Data
-          </h3>
-          <p className="text-sm text-gray-500 mb-4">
-            Start adding transactions to see your financial statistics
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Show placeholder cards */}
-            <div className="bg-green-50 rounded-lg p-4 border border-green-200 opacity-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-600 text-sm font-medium">
-                    Total Income
-                  </p>
-                  <p className="text-2xl font-bold text-green-700">$0.00</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-red-50 rounded-lg p-4 border border-red-200 opacity-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-red-600 text-sm font-medium">
-                    Total Expenses
-                  </p>
-                  <p className="text-2xl font-bold text-red-700">$0.00</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 opacity-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-600 text-sm font-medium">
-                    Net Balance
-                  </p>
-                  <p className="text-2xl font-bold text-blue-700">$0.00</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200 opacity-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm font-medium">
-                    Transactions
-                  </p>
-                  <p className="text-2xl font-bold text-gray-700">0</p>
-                </div>
-              </div>
-            </div>
+          <div className="h-4 bg-gray-200 rounded mb-4"></div>
+          <div className="space-y-3">
+            <div className="h-8 bg-gray-200 rounded"></div>
+            <div className="h-8 bg-gray-200 rounded"></div>
+            <div className="h-8 bg-gray-200 rounded"></div>
           </div>
         </div>
       </div>
@@ -149,154 +52,116 @@ const TransactionStats = ({ filters = {} }) => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Summary Statistics */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Overview</h3>
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Total Income */}
-          <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-green-600 text-sm font-medium">
-                  Total Income
-                </p>
-                <p className="text-2xl font-bold text-green-700">
-                  {formatCurrency(stats?.total_income)}
-                </p>
-              </div>
-              <ArrowUpIcon className="h-8 w-8 text-green-500" />
-            </div>
-          </div>
-
-          {/* Total Expenses */}
-          <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-red-600 text-sm font-medium">
-                  Total Expenses
-                </p>
-                <p className="text-2xl font-bold text-red-700">
-                  {formatCurrency(stats?.total_expenses)}
-                </p>
-              </div>
-              <ArrowDownIcon className="h-8 w-8 text-red-500" />
-            </div>
-          </div>
-
-          {/* Net Balance */}
-          <div
-            className={`rounded-lg p-4 border ${
-              (stats?.net_balance || 0) >= 0
-                ? "bg-blue-50 border-blue-200"
-                : "bg-orange-50 border-orange-200"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p
-                  className={`text-sm font-medium ${
-                    (stats?.net_balance || 0) >= 0
-                      ? "text-blue-600"
-                      : "text-orange-600"
-                  }`}
-                >
-                  Net Balance
-                </p>
-                <p
-                  className={`text-2xl font-bold ${
-                    (stats?.net_balance || 0) >= 0
-                      ? "text-blue-700"
-                      : "text-orange-700"
-                  }`}
-                >
-                  {formatCurrency(stats?.net_balance)}
-                </p>
-              </div>
-              <DollarSignIcon
-                className={`h-8 w-8 ${
-                  (stats?.net_balance || 0) >= 0
-                    ? "text-blue-500"
-                    : "text-orange-500"
-                }`}
-              />
-            </div>
-          </div>
-
-          {/* Transaction Count */}
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">
-                  Transactions
-                </p>
-                <p className="text-2xl font-bold text-gray-700">
-                  {stats?.transaction_count || 0}
-                </p>
-              </div>
-              <HashIcon className="h-8 w-8 text-gray-500" />
-            </div>
-          </div>
+    <div className="bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="p-1.5 bg-indigo-100 rounded-lg">
+          <PieChart className="w-4 h-4 text-indigo-600" />
         </div>
+        <h3 className="text-base font-bold text-gray-900">Quick Stats</h3>
       </div>
 
-      {/* Category Breakdown */}
-      {categoryStats.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Category Breakdown
-          </h3>
-
-          <div className="space-y-3">
-            {categoryStats.slice(0, 10).map((category, index) => {
-              const percentage = stats?.total_expenses
-                ? (
-                    (category.total_amount / stats.total_expenses) *
-                    100
-                  ).toFixed(1)
-                : 0;
-
-              return (
-                <div
-                  key={category.category}
-                  className="flex items-center justify-between py-2"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className={`w-3 h-3 rounded-full ${
-                        category.transaction_type === "income"
-                          ? "bg-green-500"
-                          : "bg-red-500"
-                      }`}
-                    ></div>
-                    <span className="font-medium text-gray-900">
-                      {category.category}
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      ({category.transaction_count} transactions)
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-gray-900">
-                      {formatCurrency(category.total_amount)}
-                    </div>
-                    <div className="text-sm text-gray-500">{percentage}%</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {categoryStats.length > 10 && (
-            <div className="text-center mt-4">
-              <span className="text-sm text-gray-500">
-                ... and {categoryStats.length - 10} more categories
-              </span>
+      <div className="space-y-3">
+        {/* Total Income */}
+        <motion.div
+          className="flex items-center justify-between p-3 bg-green-50/80 rounded-xl border border-green-200/50 hover:bg-green-100/80 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          whileHover={{ scale: 1.02, y: -2 }}
+        >
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-green-500 rounded-lg group-hover:bg-green-600 transition-colors">
+              <TrendingUp className="w-3.5 h-3.5 text-white" />
             </div>
-          )}
-        </div>
-      )}
+            <div>
+              <p className="text-xs font-medium text-green-700">Total Income</p>
+              <p className="text-base font-bold text-green-800">
+                ₹{stats.totalIncome.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Total Expenses */}
+        <motion.div
+          className="flex items-center justify-between p-3 bg-red-50/80 rounded-xl border border-red-200/50 hover:bg-red-100/80 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          whileHover={{ scale: 1.02, y: -2 }}
+        >
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-red-500 rounded-lg group-hover:bg-red-600 transition-colors">
+              <TrendingDown className="w-3.5 h-3.5 text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-red-700">Total Expenses</p>
+              <p className="text-base font-bold text-red-800">
+                ₹{stats.totalExpenses.toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Net Balance */}
+        <motion.div
+          className={`flex items-center justify-between p-3 rounded-xl border hover:shadow-lg transition-all duration-300 cursor-pointer group ${
+            stats.netBalance >= 0
+              ? "bg-blue-50/80 border-blue-200/50 hover:bg-blue-100/80"
+              : "bg-orange-50/80 border-orange-200/50 hover:bg-orange-100/80"
+          }`}
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3 }}
+          whileHover={{ scale: 1.02, y: -2 }}
+        >
+          <div className="flex items-center gap-2">
+            <div
+              className={`p-1.5 rounded-lg transition-colors ${
+                stats.netBalance >= 0
+                  ? "bg-blue-500 group-hover:bg-blue-600"
+                  : "bg-orange-500 group-hover:bg-orange-600"
+              }`}
+            >
+              <DollarSign className="w-3.5 h-3.5 text-white" />
+            </div>
+            <div>
+              <p
+                className={`text-xs font-medium ${
+                  stats.netBalance >= 0 ? "text-blue-700" : "text-orange-700"
+                }`}
+              >
+                Net Balance
+              </p>
+              <p
+                className={`text-base font-bold ${
+                  stats.netBalance >= 0 ? "text-blue-800" : "text-orange-800"
+                }`}
+              >
+                ₹{Math.abs(stats.netBalance).toLocaleString()}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Transaction Count */}
+        <motion.div
+          className="flex items-center justify-center p-3 bg-gray-50/80 rounded-xl border border-gray-200/50 hover:bg-gray-100/80 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          whileHover={{ scale: 1.02, y: -2 }}
+        >
+          <div className="text-center">
+            <p className="text-xl font-bold text-gray-800 group-hover:text-gray-900 transition-colors">
+              {stats.transactionCount}
+            </p>
+            <p className="text-xs text-gray-600 group-hover:text-gray-700 transition-colors">
+              Total Transactions
+            </p>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };

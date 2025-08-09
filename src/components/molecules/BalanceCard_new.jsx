@@ -11,17 +11,18 @@ import {
 import Image from "next/image";
 import { useStore } from "@/src/store";
 
-const BalanceCard = ({ balance = 0, spend = 0, onAddTransaction }) => {
+const BalanceCard = ({ balance = 0, spend = 0 }) => {
   const [displayedBalance, setDisplayedBalance] = useState(0);
   const [displayedSpend, setDisplayedSpend] = useState(0);
   const { fetchDebits, debits = [], dashboardInitialized } = useStore();
 
   useEffect(() => {
     // Only fetch debits if dashboard hasn't been initialized
-    if (!dashboardInitialized && fetchDebits) {
+    if (!dashboardInitialized) {
       fetchDebits();
     }
-  }, [dashboardInitialized, fetchDebits]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (balance !== null && balance !== undefined) {
@@ -62,87 +63,75 @@ const BalanceCard = ({ balance = 0, spend = 0, onAddTransaction }) => {
   }, [spend]);
 
   return (
-    <div className="bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all duration-300">
+    <div className="bg-white/50 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
       {/* Header */}
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex justify-between items-start mb-6">
         <div>
           <p className="text-sm font-medium text-gray-600 mb-1">
             Total Balance
           </p>
           <motion.div
-            className="text-2xl md:text-3xl flex items-center font-bold text-gray-900"
+            className="text-3xl md:text-4xl flex items-center font-bold text-gray-900"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <LucideIndianRupee className="w-5 h-5 md:w-6 md:h-6" />
+            <LucideIndianRupee className="w-6 h-6 md:w-8 md:h-8" />
             <span>{displayedBalance.toLocaleString()}</span>
           </motion.div>
         </div>
-        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-2.5 rounded-xl shadow-lg">
+        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-2xl shadow-lg">
           <Image
             unoptimized
             src="/wallet3.png"
-            width={28}
-            height={28}
-            className="w-7 h-7 filter brightness-0 invert"
+            width={32}
+            height={32}
+            className="w-8 h-8 filter brightness-0 invert"
             alt="wallet"
           />
         </div>
       </div>
 
       {/* Income & Expenses */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-green-50/80 rounded-xl p-3 border border-green-200/50">
-          <div className="flex items-center gap-2 mb-1.5">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-green-50/80 rounded-xl p-4 border border-green-200/50">
+          <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 bg-green-500 rounded-lg">
               <ArrowDownCircle className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xs font-medium text-green-700">Income</span>
+            <span className="text-sm font-medium text-green-700">Income</span>
           </div>
           <div className="flex items-center font-bold text-green-800">
             <IndianRupee className="w-4 h-4" />
-            <span className="text-base">
-              {displayedBalance.toLocaleString()}
-            </span>
+            <span className="text-lg">{displayedBalance.toLocaleString()}</span>
           </div>
         </div>
 
-        <div className="bg-red-50/80 rounded-xl p-3 border border-red-200/50">
-          <div className="flex items-center gap-2 mb-1.5">
+        <div className="bg-red-50/80 rounded-xl p-4 border border-red-200/50">
+          <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 bg-red-500 rounded-lg">
               <ArrowUpCircle className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xs font-medium text-red-700">Expenses</span>
+            <span className="text-sm font-medium text-red-700">Expenses</span>
           </div>
           <div className="flex items-center font-bold text-red-800">
             <IndianRupee className="w-4 h-4" />
-            <span className="text-base">{displayedSpend.toLocaleString()}</span>
+            <span className="text-lg">{displayedSpend.toLocaleString()}</span>
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          onClick={() => onAddTransaction?.("income")}
-          className="flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-green-100/80 to-emerald-100/80 hover:from-green-200/80 hover:to-emerald-200/80 rounded-xl border border-green-200/50 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] group"
-        >
-          <div className="p-1.5 bg-green-500 rounded-lg group-hover:bg-green-600 transition-colors">
-            <ArrowDownCircle className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-xs font-semibold text-green-700 group-hover:text-green-800">
+      <div className="mt-6 grid grid-cols-2 gap-3">
+        <button className="flex items-center justify-center gap-2 p-3 bg-indigo-100/80 hover:bg-indigo-200/80 rounded-xl border border-indigo-200/50 transition-colors">
+          <ArrowDownCircle className="w-4 h-4 text-indigo-600" />
+          <span className="text-sm font-medium text-indigo-700">
             Add Income
           </span>
         </button>
-        <button
-          onClick={() => onAddTransaction?.("expense")}
-          className="flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-red-100/80 to-rose-100/80 hover:from-red-200/80 hover:to-rose-200/80 rounded-xl border border-red-200/50 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] group"
-        >
-          <div className="p-1.5 bg-red-500 rounded-lg group-hover:bg-red-600 transition-colors">
-            <ArrowUpCircle className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-xs font-semibold text-red-700 group-hover:text-red-800">
+        <button className="flex items-center justify-center gap-2 p-3 bg-purple-100/80 hover:bg-purple-200/80 rounded-xl border border-purple-200/50 transition-colors">
+          <ArrowUpCircle className="w-4 h-4 text-purple-600" />
+          <span className="text-sm font-medium text-purple-700">
             Add Expense
           </span>
         </button>

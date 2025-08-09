@@ -13,9 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { PlusCircleIcon } from "lucide-react";
 import Link from "next/link";
-import AddTransactionModal from "./AddTransactionModal";
 
-export default function TransactionList() {
+export default function TransactionList({ onAddTransaction }) {
   const {
     transactions,
     recent_transactions,
@@ -31,7 +30,6 @@ export default function TransactionList() {
 
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
   // Only fetch transactions if dashboard hasn't been initialized
@@ -79,21 +77,21 @@ export default function TransactionList() {
   };
 
   return (
-    <div className="bg-white rounded-lg flex flex-col px-2 gap-2 py-2 my-2">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold flex gap-2 items-center">
+    <>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold text-gray-900 flex gap-3 items-center">
           Recent Transactions
-          <span>
-            <PlusCircleIcon
-              onClick={() => setIsModalOpen(true)}
-              className="w-4 h-4 text-indigo-400 cursor-pointer"
-            />
-          </span>
+          <button
+            onClick={() => onAddTransaction?.("expense")}
+            className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 p-2 rounded-lg shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+          >
+            <PlusCircleIcon className="w-5 h-5 text-white" />
+          </button>
         </h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="text-xs bg-[#ECEBFF] border border-indigo-400/20 p-1 rounded-full px-2 text-gray-500 hover:bg-indigo-100"
+            className="px-4 py-2 bg-white/30 backdrop-blur-sm border border-white/20 rounded-xl text-sm font-medium text-gray-700 hover:bg-white/40 transition-all duration-200"
           >
             {showFilters ? "Hide Filters" : "Show Filters"}
           </button>
@@ -170,12 +168,6 @@ export default function TransactionList() {
         </div>
       )}
 
-      {/* Add Transaction Modal */}
-      <AddTransactionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-
       {/* Edit Transaction Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
         <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
@@ -189,6 +181,6 @@ export default function TransactionList() {
           />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

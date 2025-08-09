@@ -34,7 +34,8 @@ export const useStore = create(
 
       // Transactions page initialization flag
       transactionsInitialized: false,
-      setTransactionsInitialized: (value) => set({ transactionsInitialized: value }),
+      setTransactionsInitialized: (value) =>
+        set({ transactionsInitialized: value }),
 
       // Pagination and filters
       pagination: {
