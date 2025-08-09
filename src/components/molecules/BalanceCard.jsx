@@ -22,11 +22,14 @@ import {
 const BalanceCard = ({ balance = 0, spend = 0 }) => {
   const [displayedBalance, setDisplayedBalance] = useState(0);
   const [displayedSpend, setDisplayedSpend] = useState(0);
-  const { fetchDebits, debits = [] } = useStore();
+  const { fetchDebits, debits = [], dashboardInitialized } = useStore();
   const [duration, setDuration] = useState("");
 
   useEffect(() => {
-    fetchDebits();
+    // Only fetch debits if dashboard hasn't been initialized
+    if (!dashboardInitialized) {
+      fetchDebits();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

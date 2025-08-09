@@ -14,11 +14,14 @@ import { useEffect } from "react";
 const COLORS = ["#3730A390", "#00C49F", "#FFBB28"];
 
 export default function Chart() {
-  const { transactions = [], stats = [], fetchStats } = useStore();
+  const { transactions = [], stats = [], fetchStats, dashboardInitialized } = useStore();
   console.log("stats", stats);
 
   useEffect(() => {
-    fetchStats();
+    // Only fetch stats if dashboard hasn't been initialized
+    if (!dashboardInitialized) {
+      fetchStats();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

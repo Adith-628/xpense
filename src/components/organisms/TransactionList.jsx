@@ -26,6 +26,7 @@ export default function TransactionList() {
     pagination,
     filters,
     setFilters,
+    dashboardInitialized,
   } = useStore();
 
   const [editingTransaction, setEditingTransaction] = useState(null);
@@ -33,10 +34,13 @@ export default function TransactionList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
 
-  // Fetch transactions on mount
+  // Only fetch transactions if dashboard hasn't been initialized
+  // This prevents duplicate API calls when used in dashboard
   useEffect(() => {
-    fetchTransactions();
-    fetchRecentTransactions();
+    if (!dashboardInitialized) {
+      fetchTransactions();
+      fetchRecentTransactions();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

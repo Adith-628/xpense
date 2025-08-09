@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import BalanceCard from "@/src/components/molecules/BalanceCard";
 import { useStore } from "@/src/store";
 import TransactionList from "@/src/components/organisms/TransactionList";
@@ -36,12 +36,16 @@ const HomePage = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (user && initializeDashboard) {
+  // Initialize dashboard data when user is available
+  const initializeDashboardData = useCallback(() => {
+    if (user?.id && initializeDashboard) {
       initializeDashboard();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user?.id, initializeDashboard]);
+
+  useEffect(() => {
+    initializeDashboardData();
+  }, [initializeDashboardData]);
 
   // Check if user is new (no transactions and hasn't seen onboarding)
   const isNewUser =

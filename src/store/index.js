@@ -28,6 +28,10 @@ export const useStore = create(
       transactions: [],
       debits: [],
 
+      // Inside your Zustand store:
+      dashboardInitialized: false,
+      setDashboardInitialized: (value) => set({ dashboardInitialized: value }),
+
       // Pagination and filters
       pagination: {
         total: 0,
@@ -53,7 +57,12 @@ export const useStore = create(
       },
 
       // Actions
-      setUser: (user) => set({ user }),
+      setUser: (user) => {
+        set({
+          user,
+          dashboardInitialized: false, // Reset dashboard initialization when user changes
+        });
+      },
       setLoading: (loading) => set({ loading }),
       setFilters: (filters) => set({ filters }),
 
@@ -80,6 +89,7 @@ export const useStore = create(
             total_spend: 0,
             stats: [],
             debits: [],
+            dashboardInitialized: false, // Reset dashboard initialization on signout
             transactionStats: {
               totalIncome: 0,
               totalExpenses: 0,
@@ -275,20 +285,34 @@ export const useStore = create(
 
       // Dashboard initialization - fetches all necessary data
       initializeDashboard: async () => {
-        const { user, fetchBalance, fetchSpend, fetchTransactions, fetchRecentTransactions, fetchStats } = get();
+        const {
+          user,
+          dashboardInitialized,
+          setDashboardInitialized,
+          fetchBalance,
+          fetchSpend,
+          fetchTransactions,
+          fetchRecentTransactions,
+          fetchStats,
+          fetchDebits,
+        } = get();
+
         if (!user) return;
+        if (dashboardInitialized) return; // ✅ Prevent re-runs
+
+        setDashboardInitialized(true); // Mark as initialized before fetching
 
         try {
-          // Fetch all dashboard data concurrently
           await Promise.allSettled([
             fetchBalance(),
             fetchSpend(),
             fetchTransactions(),
             fetchRecentTransactions(),
-            fetchStats()
+            fetchStats(),
+            fetchDebits(),
           ]);
         } catch (error) {
-          console.error('Error initializing dashboard:', error);
+          console.error("Error initializing dashboard:", error);
         }
       },
 
