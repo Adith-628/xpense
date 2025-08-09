@@ -19,29 +19,32 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const BalanceCard = ({ balance, spend }) => {
+const BalanceCard = ({ balance = 0, spend = 0 }) => {
   const [displayedBalance, setDisplayedBalance] = useState(0);
   const [displayedSpend, setDisplayedSpend] = useState(0);
-  const { fetchDebits, debits } = useStore();
+  const { fetchDebits, debits = [] } = useStore();
   const [duration, setDuration] = useState("");
 
   useEffect(() => {
     fetchDebits();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    debits?.map((debit) => {
-      if (debit.period == duration) {
-        setDisplayedSpend(debit.total);
-      }
-    });
-  }, [duration]);
+    if (debits && debits.length > 0) {
+      debits.forEach((debit) => {
+        if (debit.period === duration) {
+          setDisplayedSpend(debit.total || 0);
+        }
+      });
+    }
+  }, [duration, debits]);
 
   useEffect(() => {
-    if (balance !== null) {
+    if (balance !== null && balance !== undefined) {
       let start = 0;
-      const duration = 500; // animation duration in ms
-      const increment = balance / (duration / 10); // update every 10ms
+      const animationDuration = 500; // animation duration in ms
+      const increment = balance / (animationDuration / 10); // update every 10ms
 
       const timer = setInterval(() => {
         start += increment;
@@ -57,10 +60,10 @@ const BalanceCard = ({ balance, spend }) => {
   }, [balance]);
 
   useEffect(() => {
-    if (spend !== null) {
+    if (spend !== null && spend !== undefined) {
       let start = 0;
-      const duration = 500; // animation duration in ms
-      const increment = spend / (duration / 10); // update every 10ms
+      const animationDuration = 500; // animation duration in ms
+      const increment = spend / (animationDuration / 10); // update every 10ms
 
       const timer = setInterval(() => {
         start += increment;

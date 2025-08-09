@@ -1,13 +1,9 @@
-import { supabase } from "./supabase";
+import { transactionAPI } from "./api";
 
 export async function addTransaction(userId, transaction) {
   try {
-    const { data, error } = await supabase
-      .from("transactions")
-      .insert({ user_id: userId, ...transaction })
-      .select();
-    if (error) throw error;
-    return data[0];
+    const response = await transactionAPI.createTransaction(transaction);
+    return response.data;
   } catch (error) {
     console.error("Error adding transaction: ", error);
     throw error;
@@ -16,36 +12,25 @@ export async function addTransaction(userId, transaction) {
 
 export async function getTransactions(userId) {
   try {
-    const { data, error } = await supabase
-      .from("transactions")
-      .select("*")
-      .eq("user_id", userId);
-    if (error) throw error;
-    return data;
+    const response = await transactionAPI.getTransactions();
+    return response.data || [];
   } catch (error) {
     console.error("Error getting transactions: ", error);
     throw error;
   }
 }
 
-export async function addTransactionToSupabase(userId, transaction) {
+export async function addTransactionToDatabase(userId, transaction) {
   try {
-    const { data, error } = await supabase
-      .from("transactions")
-      .insert([
-        {
-          user_id: userId, // This should be a UUID string like "123e4567-e89b-12d3-a456-426614174000"
-          description: transaction.description,
-          amount: transaction.amount,
-          category: transaction.category,
-          date: transaction.date || new Date().toISOString(),
-        },
-      ])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
+    const response = await transactionAPI.createTransaction({
+      title: transaction.description || transaction.title,
+      description: transaction.description,
+      amount: transaction.amount,
+      category: transaction.category,
+      transaction_type: transaction.transaction_type || "expense",
+      date: transaction.date || new Date().toISOString().split("T")[0],
+    });
+    return response.data;
   } catch (error) {
     console.error("Error adding transaction:", error);
     throw error;
@@ -54,12 +39,8 @@ export async function addTransactionToSupabase(userId, transaction) {
 
 export async function getBalance(userId) {
   try {
-    const { data, error } = await supabase
-      .from("users")
-      .select("total_balance")
-      .eq("id", userId);
-    if (error) throw error;
-    return data[0].total_balance;
+    const response = await transactionAPI.getStatsSummary();
+    return response.data?.net_balance || 0;
   } catch (error) {
     console.error("Error getting balance: ", error);
     throw error;
@@ -68,28 +49,21 @@ export async function getBalance(userId) {
 
 export async function getSpend(userId) {
   try {
-    const { data, error } = await supabase
-      .from("users")
-      .select("total_spend")
-      .eq("id", userId);
-    if (error) throw error;
-    return data[0].total_spend;
+    const response = await transactionAPI.getStatsSummary();
+    return response.data?.total_expenses || 0;
   } catch (error) {
     console.error("Error getting spend: ", error);
     throw error;
   }
 }
 
-export async function getRecentTransactions(userId, limit) {
+export async function getRecentTransactions(userId, limit = 8) {
   try {
-    const { data, error } = await supabase
-      .from("transactions")
-      .select("*")
-      .eq("user_id", userId)
-      .order("date", { ascending: false })
-      .limit(limit);
-    if (error) throw error;
-    return data;
+    const response = await transactionAPI.getTransactions({
+      limit: limit,
+      offset: 0,
+    });
+    return response.data || [];
   } catch (error) {
     console.error("Error getting recent transactions: ", error);
     throw error;
@@ -98,11 +72,10 @@ export async function getRecentTransactions(userId, limit) {
 
 export async function getExpenseStatistics(userId) {
   try {
-    const { data, error } = await supabase.rpc("get_total_by_category", {
-      user_id_input: userId,
+    const response = await transactionAPI.getStatsCategories({
+      transaction_type: "expense",
     });
-    if (error) throw error;
-    return data;
+    return response.data || [];
   } catch (error) {
     console.error("Error getting expense statistics: ", error);
     throw error;
@@ -111,15 +84,45 @@ export async function getExpenseStatistics(userId) {
 
 export const getDebitTotals = async (userId) => {
   try {
-    const { data, error } = await supabase.rpc("get_debit_totals", {
-      user_id_input: userId,
-    });
+    // Get summary stats for expenses
+    const response = await transactionAPI.getStatsSummary();
 
-    if (error) throw error;
+    if (response.data) {
+      return [
+        {
+          period: "total",
+          total_amount: response.data.total_expenses,
+          transaction_count: response.data.transaction_count,
+        },
+      ];
+    }
 
-    return data; // Returns an array of daily, weekly, and monthly totals
+    return [];
   } catch (err) {
     console.error("Error fetching debit totals:", err);
-    return null;
+    return [];
   }
 };
+
+export async function deleteTransaction(transactionId) {
+  try {
+    const response = await transactionAPI.deleteTransaction(transactionId);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting transaction:", error);
+    throw error;
+  }
+}
+
+export async function updateTransaction(transactionId, updates) {
+  try {
+    const response = await transactionAPI.updateTransaction(
+      transactionId,
+      updates
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating transaction:", error);
+    throw error;
+  }
+}

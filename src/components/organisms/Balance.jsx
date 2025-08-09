@@ -3,17 +3,17 @@
 import { useStore } from "@/src/store";
 
 export default function Balance() {
-  const { transactions } = useStore();
+  const { transactions = [] } = useStore();
 
-  const balance = transactions.reduce(
-    (acc, transaction) => acc + transaction.amount,
-    0
-  );
-  const totalSpent = transactions.reduce(
-    (acc, transaction) =>
-      acc + (transaction.amount < 0 ? -transaction.amount : 0),
-    0
-  );
+  const balance = transactions.reduce((acc, transaction) => {
+    const amount = parseFloat(transaction.amount) || 0;
+    return acc + amount;
+  }, 0);
+
+  const totalSpent = transactions.reduce((acc, transaction) => {
+    const amount = parseFloat(transaction.amount) || 0;
+    return acc + (amount < 0 ? -amount : 0);
+  }, 0);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6 mb-8">
@@ -32,6 +32,11 @@ export default function Balance() {
           </p>
         </div>
       </div>
+      {transactions.length === 0 && (
+        <div className="mt-4 text-center text-gray-500">
+          <p className="text-sm">No transactions recorded yet</p>
+        </div>
+      )}
     </div>
   );
 }

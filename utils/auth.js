@@ -1,37 +1,20 @@
 import { useStore } from "@/src/store";
-import { supabase } from "./supabase";
+import { authAPI, profileAPI } from "./api";
 
 export async function signIn(email, password) {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const response = await authAPI.login(email, password);
 
-    if (error) throw error;
-
-    if (data.user) {
-      const userId = data.user.id;
-
+    if (response.user) {
       // Fetch user profile details
-      const { data: profile, error: profileError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", userId)
-        .single();
-
-      if (profileError) {
-        console.error("Error fetching profile:", profileError);
-        throw profileError;
-      }
+      const profile = await profileAPI.getProfile();
 
       // Store user details in Zustand
       useStore.getState().setUser({
-        id: userId,
-        email: data.user.email || "",
-        name: profile.name || "",
-        phone: profile.phone || "",
-        address: profile.address || "",
+        id: response.user.id,
+        email: response.user.email || "",
+        fullName: response.user.fullName || "",
+        ...profile.data,
       });
     }
   } catch (error) {
@@ -42,8 +25,7 @@ export async function signIn(email, password) {
 
 export async function signOut() {
   try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    await authAPI.logout();
     useStore.getState().setUser(null);
   } catch (error) {
     console.error("Error signing out: ", error);
@@ -51,41 +33,19 @@ export async function signOut() {
   }
 }
 
-export async function signUp(email, password, name, phone, address) {
+export async function signUp(email, password, fullName, phone, address) {
   try {
-    // Sign up the user with email and password
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+    // Sign up the user with email, password, and fullName
+    const response = await authAPI.register(email, password, fullName);
 
-    if (error) throw error;
-
-    if (data?.user) {
-      const userId = data.user.id;
-
-      // Insert user details into the profiles table
-      const { error: profileError } = await supabase.from("users").insert([
-        {
-          id: userId,
-          name,
-          phone,
-          address,
-        },
-      ]);
-
-      if (profileError) {
-        console.error("Error inserting profile:", profileError);
-        throw profileError;
-      }
-
+    if (response.user) {
       // Store user details in Zustand
       useStore.getState().setUser({
-        id: userId,
-        email,
-        name,
-        phone,
-        address,
+        id: response.user.id,
+        email: response.user.email,
+        fullName: response.user.fullName,
+        phone: phone || "",
+        address: address || "",
       });
     }
   } catch (error) {
@@ -95,47 +55,29 @@ export async function signUp(email, password, name, phone, address) {
 }
 
 export async function initAuth() {
-  // Check for existing session
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  if (session?.user) {
-    useStore.getState().setUser({
-      id: session.user.id,
-      email: session.user.email || "",
-    });
-  }
+  try {
+    // Check if we have an auth token
+    const token = localStorage.getItem("authToken");
 
-  // Listen for auth changes
-  supabase.auth.onAuthStateChange(async (event, session) => {
-    if (session?.user) {
-      useStore.getState().setUser({
-        id: session.user.id,
-        email: session.user.email || "",
-      });
-    } else {
-      useStore.getState().setUser(null);
+    if (token) {
+      // Try to fetch profile to verify token is valid
+      const profile = await profileAPI.getProfile();
+
+      if (profile.data) {
+        useStore.getState().setUser({
+          id: profile.data.id,
+          email: profile.data.email || "",
+          fullName: profile.data.fullName || "",
+          phone: profile.data.phone || "",
+          address: profile.data.address || "",
+          total_balance: profile.data.total_balance || 0,
+        });
+      }
     }
-  });
-
-  if (session?.user) {
-    const { data: profile, error: profileError } = await supabase
-      .from("users")
-      .select("*")
-      .eq("id", session.user.id)
-      .single();
-
-    if (profileError) {
-      console.error("Error fetching profile:", profileError);
-      throw profileError;
-    }
-    useStore.getState().setUser({
-      id: session.user.id,
-      email: session.user.email || "",
-      name: profile.name || "",
-      phone: profile.phone || "",
-      address: profile.address || "",
-      total_balance: profile.total_balance || "",
-    });
+  } catch (error) {
+    console.error("Error initializing auth:", error);
+    // If token is invalid, clear it
+    localStorage.removeItem("authToken");
+    useStore.getState().setUser(null);
   }
 }

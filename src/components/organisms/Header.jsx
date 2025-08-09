@@ -35,7 +35,9 @@ export default function Header() {
           </div>
           <div className="font-urbanist flex flex-col leading-4 ">
             <span className="text-xs">Welcome!</span>
-            <span className="text-md font-semibold">{user?.name}</span>
+            <span className="text-md font-semibold">
+              {user?.fullName || user?.name}
+            </span>
           </div>
         </div>
         <div className="flex items-center space-x-4">

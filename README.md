@@ -1,36 +1,183 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Xpense - Personal Expense Tracker
+
+Xpense helps you track your income, spending, and budget effortlessly. Categorize transactions, analyze spending trends, and stay financially organized.
+
+This is a [Next.js](https://nextjs.org) project that connects to a REST API backend for data management.
+
+## Features
+
+- 🔐 User Authentication (Register, Login, Logout)
+- 💰 Transaction Management (Add, View, Edit, Delete)
+- 📊 Expense Analytics and Statistics
+- 🏷️ Category Management (Default + Custom Categories)
+- 📱 Responsive Mobile-First Design
+- 🔒 Secure JWT Authentication
+
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 18, Tailwind CSS
+- **State Management**: Zustand
+- **UI Components**: Radix UI, Lucide React
+- **Forms**: React Hook Form
+- **Charts**: Recharts, ApexCharts
+
+## Backend API
+
+This frontend connects to the Xpense Backend API deployed at:
+`https://xpense-backend-production.up.railway.app/`
+
+The API provides secure endpoints for:
+
+- User authentication and profile management
+- Transaction CRUD operations
+- Category management
+- Statistics and analytics
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18 or higher
+- npm or yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd xpense
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+```
+
+3. Create environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+4. Update the environment variables in `.env.local` if needed (API URL is pre-configured)
+
+5. Run the development server:
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `NEXT_PUBLIC_API_BASE_URL`: Base URL for the backend API (defaults to production URL)
 
-## Learn More
+## API Integration
 
-To learn more about Next.js, take a look at the following resources:
+The app uses a custom API utility (`utils/api.js`) that handles:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Authentication tokens (stored in localStorage)
+- HTTP requests with proper headers
+- Error handling and response parsing
+- Automatic token refresh
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```
+src/
+├── components/
+│   ├── atoms/          # Small reusable components
+│   ├── molecules/      # Component combinations
+│   └── organisms/      # Complex feature components
+├── store/             # Zustand state management
+└── database/          # Database schema (reference)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+utils/
+├── api.js            # API utility functions
+├── auth.js           # Authentication helpers
+└── database.js       # Database operation wrappers
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+app/                  # Next.js app router pages
+├── dashboard/        # Main dashboard
+├── login/           # Authentication
+├── signup/          # User registration
+├── profile/         # User profile
+└── transactions/    # Transaction history
+```
+
+## Key Components
+
+- **AddTransaction**: Modal form for creating new transactions
+- **TransactionList**: Display recent transactions
+- **BalanceCard**: Show current balance and spending
+- **Header**: Navigation and user info
+- **LoginForm/SignupForm**: Authentication forms
+
+## Authentication Flow
+
+1. User registers/logs in through the API
+2. JWT token is stored in localStorage
+3. Token is automatically included in API requests
+4. User profile is fetched and stored in Zustand state
+5. Protected routes check for valid authentication
+
+## API Endpoints Used
+
+### Authentication
+
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+- `POST /api/auth/logout` - User logout
+- `GET /api/protected/profile` - Get user profile
+
+### Transactions
+
+- `GET /api/transactions` - Get user transactions
+- `POST /api/transactions` - Create transaction
+- `PUT /api/transactions/:id` - Update transaction
+- `DELETE /api/transactions/:id` - Delete transaction
+- `GET /api/transactions/stats/summary` - Get statistics
+
+### Categories
+
+- `GET /api/categories` - Get all categories
+- `POST /api/categories/custom` - Create custom category
+
+## Building for Production
+
+```bash
+npm run build
+npm start
+```
+
+## Deployment
+
+The app can be deployed to any platform that supports Next.js:
+
+- **Vercel** (recommended)
+- **Netlify**
+- **Railway**
+- **AWS/GCP/Azure**
+
+Make sure to set the `NEXT_PUBLIC_API_BASE_URL` environment variable in your deployment platform.
+
+## Changes from Previous Version
+
+- ✅ Removed Supabase integration
+- ✅ Removed Firebase dependencies
+- ✅ Implemented REST API integration
+- ✅ Updated authentication flow
+- ✅ Migrated to JWT token-based auth
+- ✅ Updated all CRUD operations
+- ✅ Maintained existing UI/UX
+
+## License
+
+This project is licensed under the MIT License.

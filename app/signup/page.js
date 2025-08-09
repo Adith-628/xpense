@@ -7,7 +7,7 @@ import Image from "next/image";
 
 export default function SignUpForm() {
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
     password: "",
     phone: "",
@@ -28,7 +28,7 @@ export default function SignUpForm() {
       await signUp(
         formData.email,
         formData.password,
-        formData.name,
+        formData.fullName,
         formData.phone,
         formData.address
       );
@@ -65,15 +65,15 @@ export default function SignUpForm() {
           {/* Name Field */}
           <div>
             <label
-              htmlFor="name"
+              htmlFor="fullName"
               className="block text-sm font-medium text-gray-700"
             >
-              Name
+              Full Name
             </label>
             <input
               type="text"
-              id="name"
-              value={formData.name}
+              id="fullName"
+              value={formData.fullName}
               onChange={handleChange}
               required
               className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 transition"
